@@ -362,3 +362,14 @@ getInventoris = async (id) => {
   }
   return payload;
 };
+
+exports.delete = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await PerbaikanHardware.destroy({ where: { id } });
+    const result = await PerbaikanHardware.findAll();
+    res.send(result);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};

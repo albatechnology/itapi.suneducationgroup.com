@@ -46,5 +46,8 @@ module.exports = (app) => {
     console.log(req.body);
     perbaikanHardware.update(req, res);
   });
+  router.delete("/:id", (req, res) => {
+    perbaikanHardware.delete(req, res);
+  });
   app.use("/api/perbaikanhardware", router);
 };
