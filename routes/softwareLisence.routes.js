@@ -7,15 +7,12 @@ module.exports = (app) => {
   });
 
   router.get("/", (req, res) => {
-    console.log(req.body);
     softwareLisence.getAll(req, res);
   });
   router.get("/:id", (req, res) => {
-    console.log(req.body);
     softwareLisence.getById(req, res);
   });
   router.get("/software/:id", (req, res) => {
-    console.log(req.body);
     softwareLisence.getBySoftware(req, res);
   });
 

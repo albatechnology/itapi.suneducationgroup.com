@@ -11,17 +11,33 @@ exports.getAll = (req, res) => {
     res.send(data);
   });
 };
-exports.getBySoftware = (req, res) => {
-  const softwareId = req.params.id;
-  sequelize
-    .query("select * from software_lisences where software_id = ?  ", {
-      replacements: [softwareId],
-      type: QueryTypes.SELECT,
-    })
-    .then((selData) => {
-      res.send(selData);
-    });
+
+exports.getById = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await sequelize.query();
+  } catch (e) {
+    res.status(400).send(e);
+  }
 };
+
+exports.getBySoftware = async (req, res) => {
+  const softwareId = req.params.id;
+  console.log("softwareId", softwareId);
+  try {
+    const result = await sequelize.query(
+      "select software.nama_software,software_lisences.* from software_lisences join software on software.id = software_lisences.software_id where software_lisences.software_id = ?  ",
+      {
+        replacements: [softwareId],
+        type: QueryTypes.SELECT,
+      }
+    );
+    res.send(result);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};
+
 exports.create = async (req, res) => {
   const lisences = req.body;
   const user_id = req.user.user_id;
