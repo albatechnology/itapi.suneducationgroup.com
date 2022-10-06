@@ -19,6 +19,8 @@ module.exports = (app) => {
   router.put("/", (req, res) => {
     formPermintaan.update(req, res);
   });
-
+  router.delete("/:id", (req, res) => {
+    formPermintaan.delete(req, res);
+  });
   app.use("/api/formpermintaan", router);
 };
