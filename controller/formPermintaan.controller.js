@@ -70,23 +70,25 @@ exports.generatePdf = async (req, res) => {
   });
 };
 
-exports.update = (req, res) => {
-  /*
-  const { id, nama_software, deskripsi } = req.body;
-  FormPermintaan.update(
-    {
-      nama_software,
-      deskripsi,
-    },
-    { where: { id } }
-  )
-    .then((obj) => {
-      res.status(200).send({ error_code: 0, payload: req.body });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: "Error update SupplierVendor with id=" + id,
-      });
-    });
-    */
+// exports.update = async (req, res) => {
+//   const { id, tanggal_pengajuan, alasan_pembelian, details } = req.body;
+//   const user_id = req.user.user_id;
+//   try {
+//     const updateResult = await PerbaikanHardware.update({
+
+//     })
+//   } catch (e) {
+//     res.send(e);
+//   }
+// };
+
+exports.delete = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await FormPermintaan.destroy({ where: { id } });
+    const result = await FormPermintaan.findAll();
+    res.send(result);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 };
