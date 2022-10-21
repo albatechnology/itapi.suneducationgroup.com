@@ -15,7 +15,26 @@ exports.getAll = (req, res) => {
 exports.getById = async (req, res) => {
   const id = req.params.id;
   try {
-    const result = await sequelize.query();
+    const result = await sequelize.query(
+      "select software.nama_software,software_lisences.*, s.nama_pt as nama_supplier from software_lisences join software on software.id = software_lisences.software_id join suppliervendors s on s.id=software_lisences.supplier_id where software_lisences.software_id = ?",
+      {
+        replacements: [id],
+        type: QueryTypes.SELECT,
+      }
+    );
+    // let payload = {};
+    payload = {
+      error_code: 0,
+      data: {
+        ...result[0],
+      },
+    };
+    // if (result[0] !== undefined) {
+    //   const licenseResult = await sequelize.query(
+
+    //   )
+    // }
+    res.send(payload);
   } catch (e) {
     res.status(400).send(e);
   }
