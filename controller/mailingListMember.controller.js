@@ -41,7 +41,7 @@ exports.create = async (req, res) => {
     let reqdata = {
       email: item,
     };
-    let fullname = "";
+    let fullname = req.body.fullname;
     let user_id = null;
     try {
       const apiRes = await fetch(

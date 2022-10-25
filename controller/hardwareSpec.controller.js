@@ -4,11 +4,22 @@ const sequelize = db.sequelize;
 const { QueryTypes, json } = require("sequelize");
 
 exports.getAll = async (req, res) => {
+  // try {
+  //   const result = await HardwareSpec.findAll({
+  //     order: [["nama_hardware", "asc"]],
+  //   });
+  //   //console.log(req.user);
+  //   res.send(result);
+  // } catch (e) {
+  //   res.status(400).send(e);
+  // }
   try {
-    const result = await HardwareSpec.findAll({
-      order: [["nama_hardware", "asc"]],
-    });
-    //console.log(req.user);
+    const result = await sequelize.query(
+      "select hardware_spesifikasis.*,(select count(hardware_inventoris.hardware_spesifikasi_id) from hardware_inventoris where hardware_inventoris.hardware_spesifikasi_id = hardware_spesifikasis.id) as software_count from hardware_spesifikasis",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
     res.send(result);
   } catch (e) {
     res.status(400).send(e);

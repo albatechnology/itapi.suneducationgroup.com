@@ -12,8 +12,13 @@ module.exports = (app) => {
   router.get("/:id", (req, res) => {
     softwareLisence.getById(req, res);
   });
+
   router.get("/software/:id", (req, res) => {
     softwareLisence.getBySoftware(req, res);
+  });
+
+  router.get("/software/:softwareid/:id", (req, res) => {
+    softwareLisence.getBySoftwareLicenseId(req, res);
   });
 
   router.post("/", (req, res) => {

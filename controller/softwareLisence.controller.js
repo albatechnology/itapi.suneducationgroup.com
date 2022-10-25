@@ -23,7 +23,7 @@ exports.getById = async (req, res) => {
       }
     );
     // let payload = {};
-    payload = {
+    let payload = {
       error_code: 0,
       data: {
         ...result[0],
@@ -42,7 +42,6 @@ exports.getById = async (req, res) => {
 
 exports.getBySoftware = async (req, res) => {
   const softwareId = req.params.id;
-  console.log("softwareId", softwareId);
   try {
     const result = await sequelize.query(
       "select software.nama_software,software_lisences.* from software_lisences join software on software.id = software_lisences.software_id where software_lisences.software_id = ?  ",
@@ -52,6 +51,22 @@ exports.getBySoftware = async (req, res) => {
       }
     );
     res.send(result);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};
+
+exports.getBySoftwareLicenseId = async (req, res) => {
+  const softwareLicenseId = req.params.id;
+  try {
+    const result = await sequelize.query(
+      "select software.nama_software,software_lisences.* from software_lisences join software on software.id = software_lisences.software_id where software_lisences.id = ?  ",
+      {
+        replacements: [softwareLicenseId],
+        type: QueryTypes.SELECT,
+      }
+    );
+    res.send(result[0]);
   } catch (e) {
     res.status(400).send(e);
   }

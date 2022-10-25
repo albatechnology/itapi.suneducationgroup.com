@@ -21,7 +21,6 @@ exports.getAll = async (req, res) => {
 
 exports.getById = async (req, res) => {
   const id = req.params.id;
-  console.log("id", id);
   try {
     const result = await sequelize.query(
       "select i.*,hs.nama_hardware,s.nama_pt as nama_supplier  from hardware_inventoris i join hardware_spesifikasis hs on hs.id = i.hardware_spesifikasi_id join suppliervendors s on s.id = i.supplier_id where i.id = ?  ",
@@ -48,7 +47,7 @@ exports.getById = async (req, res) => {
     } else {
       payload = {
         error_code: 1,
-        message: "data tidak ditemukan",
+        message: "data not found",
       };
     }
 
