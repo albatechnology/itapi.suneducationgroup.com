@@ -16,7 +16,7 @@ const getByFormPermintaanId = async (formPermintaanId) => {
     }
   );
   const formPermintaanDetails = await sequelize.query(
-    "SELECT * FROM form_permintaans as fp join form_permintaan_details as fpd on fp.id = fpd.form_permintaan_id join suppliervendors as sv on sv.id = fp.supplier_id where fp.id = ?",
+    "SELECT fpd.* FROM form_permintaans as fp join form_permintaan_details as fpd on fp.id = fpd.form_permintaan_id join suppliervendors as sv on sv.id = fp.supplier_id where fp.id = ?",
     {
       replacements: [formPermintaanId],
       type: QueryTypes.SELECT,
@@ -90,27 +90,28 @@ exports.getByFormPermintaanId = async (req, res) => {
 
 exports.update = async (req, res, next) => {
   const id = req.params.id;
-  const detailsData = [];
+  // const detailsData = [];
   try {
     const { supplier_id, tanggal_pengajuan, alasan_pembelian, details } =
       req.body;
-    const formPermintaanDetails = await FormPermintaanDetails.destroy({
-      where: { form_permintaan_id: id },
-    });
-
+    const result = await FormPermintaan.update(
+      { supplier_id, tanggal_pengajuan, alasan_pembelian },
+      { where: { id: id } }
+    );
     if (details.length > 0) {
-      // insert details
+      const formPermintaanDetails = await FormPermintaanDetails.destroy({
+        where: { form_permintaan_id: id },
+      });
       details.forEach(async (detail) => {
         const detailData = await FormPermintaanDetails.create({
           ...detail,
           form_permintaan_id: id,
           harga_total: detail.harga_satuan * detail.qty,
         });
-        detailsData.push(detailData);
+        // detailsData.push(detailData);
         detailData.save();
       });
     }
-
     res
       .status(200)
       .send({ error_code: 0, payload: await getByFormPermintaanId(id) });
