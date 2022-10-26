@@ -3,6 +3,31 @@ const FormPermintaan = db.FormPermintaan;
 const FormPermintaanDetails = db.FormPermintaanDetails;
 const sequelize = db.sequelize;
 const { QueryTypes } = require("sequelize");
+const PDFDocument = require("pdfkit");
+const doc = new PDFDocument();
+const fs = require("fs");
+
+const getByFormPermintaanId = async (formPermintaanId) => {
+  const formPermintaan = await sequelize.query(
+    "SELECT * FROM form_permintaans as fp join suppliervendors as sv on sv.id = fp.supplier_id where fp.id = ?",
+    {
+      replacements: [formPermintaanId],
+      type: QueryTypes.SELECT,
+    }
+  );
+  const formPermintaanDetails = await sequelize.query(
+    "SELECT * FROM form_permintaans as fp join form_permintaan_details as fpd on fp.id = fpd.form_permintaan_id join suppliervendors as sv on sv.id = fp.supplier_id where fp.id = ?",
+    {
+      replacements: [formPermintaanId],
+      type: QueryTypes.SELECT,
+    }
+  );
+
+  return {
+    ...formPermintaan[0],
+    details: formPermintaanDetails,
+  };
+};
 
 exports.getAll = async (req, res) => {
   try {
@@ -46,28 +71,98 @@ exports.create = async (req, res) => {
 
     res.send({
       error_code: 0,
-      payload: {
-        formPermintaan: formPermintaanData,
-        details: detailsData,
-      },
+      payload: await getByFormPermintaanId(formPermintaanData.id),
     });
   } catch (e) {
     res.status(500).send(e);
   }
-
-  //console.log(req.body);
 };
+
+exports.getByFormPermintaanId = async (req, res) => {
+  const formPermintaanId = req.params.id;
+  try {
+    res.send(await getByFormPermintaanId(formPermintaanId));
+  } catch (e) {
+    res.status(400).send(e);
+  }
+  //res.send(hardwareSpecId);
+};
+
+exports.update = async (req, res, next) => {
+  const id = req.params.id;
+  const detailsData = [];
+  try {
+    const { supplier_id, tanggal_pengajuan, alasan_pembelian, details } =
+      req.body;
+    const formPermintaanDetails = await FormPermintaanDetails.destroy({
+      where: { form_permintaan_id: id },
+    });
+
+    if (details.length > 0) {
+      // insert details
+      details.forEach(async (detail) => {
+        const detailData = await FormPermintaanDetails.create({
+          ...detail,
+          form_permintaan_id: id,
+          harga_total: detail.harga_satuan * detail.qty,
+        });
+        detailsData.push(detailData);
+        detailData.save();
+      });
+    }
+
+    res
+      .status(200)
+      .send({ error_code: 0, payload: await getByFormPermintaanId(id) });
+  } catch (error) {
+    res.status(500).send({
+      message: "Error update Form Permintaan with id=" + id,
+    });
+  }
+};
+
 exports.generatePdf = async (req, res) => {
-  //console.log(req.body);
-  var fs = require("fs");
-  var pdf = require("html-pdf");
-  var html = fs.readFileSync("./public/templateFormPermintaan.html", "utf8");
-  var options = { format: "Letter" };
-  console.log("html", html);
-  pdf.create(html, options).toFile("./public/testpdf.pdf", function (err, res) {
-    if (err) return console.log(err);
-    console.log(res); // { filename: '/app/businesscard.pdf' }
-  });
+  try {
+    var now = new Date();
+    doc.pipe(
+      fs.createWriteStream(
+        "./public/formpermintaan-" +
+          now.getFullYear() +
+          "-" +
+          now.getMonth() +
+          "-" +
+          now.getDate() +
+          ".pdf"
+      )
+    );
+    doc.fontSize(27).text("Form Permintaan", 100, 100);
+    doc
+      .addPage()
+      .fontSize(15)
+      .text("Generating PDF with the help of pdfkit", 100, 100);
+
+    // Apply some transforms and render an SVG path with the
+    // 'even-odd' fill rule
+    doc
+      .scale(0.6)
+      .translate(470, -380)
+      .path("M 250,75 L 323,301 131,161 369,161 177,301 z")
+      .fill("red", "even-odd")
+      .restore();
+
+    // Add some text with annotations
+    doc
+      .addPage()
+      .fillColor("blue")
+      .text("The link for GeeksforGeeks website", 100, 100)
+
+      .link(100, 100, 160, 27, "https://www.geeksforgeeks.org/");
+
+    // Finalize PDF file
+    doc.end();
+  } catch (e) {
+    res.status(400).send(e);
+  }
 };
 
 // exports.update = async (req, res) => {
