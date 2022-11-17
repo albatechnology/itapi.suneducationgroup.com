@@ -10,6 +10,10 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.DATEONLY,
       allowNull: false,
     },
+    date_available: {
+      type: Sequelize.DATEONLY,
+      allowNull: false,
+    },
     supplier_id: {
       type: Sequelize.INTEGER,
       allowNull: false,

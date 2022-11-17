@@ -40,14 +40,20 @@ exports.getAll = async (req, res) => {
   }
 };
 exports.create = async (req, res) => {
-  const { supplier_id, tanggal_pengajuan, alasan_pembelian, details } =
-    req.body;
+  const {
+    supplier_id,
+    date_available,
+    tanggal_pengajuan,
+    alasan_pembelian,
+    details,
+  } = req.body;
   const user_id = req.user.user_id;
   const detailsData = [];
   try {
     const formPermintaanData = await FormPermintaan.create({
       supplier_id,
       tanggal_pengajuan,
+      date_available,
       alasan_pembelian,
       create_user_id: user_id,
     });
