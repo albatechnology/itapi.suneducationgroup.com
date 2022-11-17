@@ -48,7 +48,6 @@ exports.create = async (req, res) => {
     const formPermintaanData = await FormPermintaan.create({
       supplier_id,
       tanggal_pengajuan,
-      date_available,
       alasan_pembelian,
       create_user_id: user_id,
     });
