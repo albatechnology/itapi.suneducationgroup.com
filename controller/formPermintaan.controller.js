@@ -3,10 +3,6 @@ const FormPermintaan = db.FormPermintaan;
 const FormPermintaanDetails = db.FormPermintaanDetails;
 const sequelize = db.sequelize;
 const { QueryTypes } = require("sequelize");
-const pdf = require("pdf-creator-node");
-const fs = require("fs");
-const path = require("path");
-const options = require("../helpers/options");
 
 const getByFormPermintaanId = async (formPermintaanId) => {
   const formPermintaan = await sequelize.query(
