@@ -19,7 +19,6 @@ module.exports = (app) => {
   });
 
   router.post("/generatepdf", (req, res) => {
-    //console.log(req.body);
     formPermintaan.generatePdf(req, res);
   });
 

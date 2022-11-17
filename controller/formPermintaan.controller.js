@@ -3,9 +3,10 @@ const FormPermintaan = db.FormPermintaan;
 const FormPermintaanDetails = db.FormPermintaanDetails;
 const sequelize = db.sequelize;
 const { QueryTypes } = require("sequelize");
-const PDFDocument = require("pdfkit");
-const doc = new PDFDocument();
+const pdf = require("pdf-creator-node");
 const fs = require("fs");
+const path = require("path");
+const options = require("../helpers/options");
 
 const getByFormPermintaanId = async (formPermintaanId) => {
   const formPermintaan = await sequelize.query(
@@ -51,6 +52,7 @@ exports.create = async (req, res) => {
     const formPermintaanData = await FormPermintaan.create({
       supplier_id,
       tanggal_pengajuan,
+      date_available,
       alasan_pembelian,
       create_user_id: user_id,
     });
@@ -122,59 +124,68 @@ exports.update = async (req, res, next) => {
   }
 };
 
-exports.generatePdf = async (req, res) => {
+exports.generatePdf = async (req, res, next) => {
   try {
-    var now = new Date();
-    doc.pipe(
-      fs.createWriteStream(
-        "./public/formpermintaan-" +
-          now.getFullYear() +
-          "-" +
-          now.getMonth() +
-          "-" +
-          now.getDate() +
-          ".pdf"
-      )
-    );
-    doc.fontSize(27).text("Form Permintaan", 100, 100);
-    doc
-      .addPage()
-      .fontSize(15)
-      .text("Generating PDF with the help of pdfkit", 100, 100);
-
-    // Apply some transforms and render an SVG path with the
-    // 'even-odd' fill rule
-    doc
-      .scale(0.6)
-      .translate(470, -380)
-      .path("M 250,75 L 323,301 131,161 369,161 177,301 z")
-      .fill("red", "even-odd")
-      .restore();
-
-    // Add some text with annotations
-    doc
-      .addPage()
-      .fillColor("blue")
-      .text("The link for GeeksforGeeks website", 100, 100)
-
-      .link(100, 100, 160, 27, "https://www.geeksforgeeks.org/");
-
-    // Finalize PDF file
-    doc.end();
+    const ids = req.body.ids || [];
+    let resultArray = [];
+    for (const id of ids) {
+      const data = await getByFormPermintaanId(id);
+      let result = {
+        submission_date: data.tanggal_pengajuan,
+        note: data.alasan_pembelian,
+        supplier_id: data.supplier_id,
+        supplier_name: data.nama_pt,
+        details: data.details,
+      };
+      resultArray.push(result);
+    }
+    console.log("cek resultArray", resultArray);
   } catch (e) {
     res.status(400).send(e);
   }
 };
 
-// exports.update = async (req, res) => {
-//   const { id, tanggal_pengajuan, alasan_pembelian, details } = req.body;
-//   const user_id = req.user.user_id;
+// exports.generatePdf = async (req, res) => {
 //   try {
-//     const updateResult = await PerbaikanHardware.update({
+//     var now = new Date();
+//     doc.pipe(
+//       fs.createWriteStream(
+//         "./public/formpermintaan-" +
+//           now.getFullYear() +
+//           "-" +
+//           now.getMonth() +
+//           "-" +
+//           now.getDate() +
+//           ".pdf"
+//       )
+//     );
+//     doc.fontSize(27).text("Form Permintaan", 100, 100);
+//     doc
+//       .addPage()
+//       .fontSize(15)
+//       .text("Generating PDF with the help of pdfkit", 100, 100);
 
-//     })
+//     // Apply some transforms and render an SVG path with the
+//     // 'even-odd' fill rule
+//     doc
+//       .scale(0.6)
+//       .translate(470, -380)
+//       .path("M 250,75 L 323,301 131,161 369,161 177,301 z")
+//       .fill("red", "even-odd")
+//       .restore();
+
+//     // Add some text with annotations
+//     doc
+//       .addPage()
+//       .fillColor("blue")
+//       .text("The link for GeeksforGeeks website", 100, 100)
+
+//       .link(100, 100, 160, 27, "https://www.geeksforgeeks.org/");
+
+//     // Finalize PDF file
+//     doc.end();
 //   } catch (e) {
-//     res.send(e);
+//     res.status(400).send(e);
 //   }
 // };
 
