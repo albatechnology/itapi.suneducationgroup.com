@@ -120,7 +120,7 @@ exports.update = async (req, res, next) => {
   }
 };
 
-exports.generatePdf = async (req, res, next) => {
+exports.generatePdf = async (req, res) => {
   try {
     const ids = req.body.ids || [];
     let resultArray = [];
@@ -135,7 +135,8 @@ exports.generatePdf = async (req, res, next) => {
       };
       resultArray.push(result);
     }
-    console.log("cek resultArray", resultArray);
+    res.send(resultArray);
+    console.log("cek payloadererererer", resultArray);
   } catch (e) {
     res.status(400).send(e);
   }
