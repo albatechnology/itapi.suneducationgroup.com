@@ -2,6 +2,7 @@ module.exports = (app) => {
   var router = require("express").Router();
   const ticketPerbaikan = require("../controller").ticketPerbaikan;
   const authentication = require("../controller").authentication;
+
   router.use((req, res, next) => {
     authentication.authenticateToken(req, res, next);
   });

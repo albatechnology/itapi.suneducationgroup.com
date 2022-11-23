@@ -1,5 +1,6 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
 
 const express = require("express");
 const cors = require("cors");
@@ -14,6 +15,31 @@ const fileUpload = require("express-fileupload");
 var corsOptions = {
   origin: "http://localhost:3001",
 };
+
+const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    callback(null, "images");
+  },
+  filename: (req, file, callback) => {
+    var filename = `${Date.now()}-'sunedu'-${file.originalname}`;
+    callback(null, filename);
+  },
+});
+
+const fileFilter = (req, file, callback) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/jpg"
+  ) {
+    callback(null, true);
+  } else {
+    callback(null, false);
+  }
+};
+
+app.use(multer({ storage: storage, fileFilter: fileFilter }).single("image"));
+
 app.use("/public", express.static("public"));
 
 app.use(cors(corsOptions));

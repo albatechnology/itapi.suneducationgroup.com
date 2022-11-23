@@ -13,6 +13,9 @@ module.exports = (sequelize, Sequelize) => {
     subject: {
       type: Sequelize.STRING,
     },
+    image: {
+      type: Sequelize.STRING,
+    },
     tanggal_pengajuan: {
       type: Sequelize.DATEONLY,
       allowNull: false,

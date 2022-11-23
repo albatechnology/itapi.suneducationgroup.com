@@ -29,14 +29,23 @@ const {
 exports.create = async (req, res) => {
   const { subject, jenis_perbaikan, tanggal_pengajuan, alasan, inventoris } =
     req.body;
+  const img = req.file.path;
   const user_id = req.user.user_id;
   const listInventori = [];
+
+  if (!req.file) {
+    const err = new Error("Image tidak boleh kosong");
+    err.errStatus = 422;
+    throw err;
+  }
+
   try {
     const ticketData = {
       jenis_ticket: "PERBAIKAN",
       subject,
       tanggal_pengajuan,
       alasan,
+      image: img,
       status: 1, // create
       create_user_id: user_id,
     };

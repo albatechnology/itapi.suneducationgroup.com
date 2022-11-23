@@ -10,6 +10,9 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    code: {
+      type: Sequelize.STRING,
+    },
     no_urut: {
       type: Sequelize.INTEGER,
       allowNull: false,
