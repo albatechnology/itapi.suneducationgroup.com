@@ -46,6 +46,7 @@ exports.create = async (req, res) => {
     tanggal_pengajuan,
     alasan_pembelian,
     note,
+    request_by,
     details,
   } = req.body;
   const user_id = req.user.user_id;
@@ -57,6 +58,7 @@ exports.create = async (req, res) => {
       date_available,
       alasan_pembelian,
       note,
+      request_by,
       create_user_id: user_id,
     });
     formPermintaanData.save();
@@ -103,6 +105,7 @@ exports.update = async (req, res, next) => {
       tanggal_pengajuan,
       alasan_pembelian,
       note,
+      request_by,
       details,
     } = req.body;
     const result = await FormPermintaan.update(
@@ -112,6 +115,7 @@ exports.update = async (req, res, next) => {
         tanggal_pengajuan,
         alasan_pembelian,
         note,
+        request_by,
       },
       { where: { id: id } }
     );
