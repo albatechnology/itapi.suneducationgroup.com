@@ -24,6 +24,9 @@ module.exports = (sequelize, Sequelize) => {
     note: {
       type: Sequelize.STRING,
     },
+    request_by: {
+      type: Sequelize.STRING,
+    },
     create_user_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
