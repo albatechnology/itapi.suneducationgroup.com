@@ -21,6 +21,9 @@ module.exports = (sequelize, Sequelize) => {
     alasan_pembelian: {
       type: Sequelize.STRING,
     },
+    note: {
+      type: Sequelize.STRING,
+    },
     create_user_id: {
       type: Sequelize.INTEGER,
       allowNull: false,

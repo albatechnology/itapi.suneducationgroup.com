@@ -45,6 +45,7 @@ exports.create = async (req, res) => {
     date_available,
     tanggal_pengajuan,
     alasan_pembelian,
+    note,
     details,
   } = req.body;
   const user_id = req.user.user_id;
@@ -55,6 +56,7 @@ exports.create = async (req, res) => {
       tanggal_pengajuan,
       date_available,
       alasan_pembelian,
+      note,
       create_user_id: user_id,
     });
     formPermintaanData.save();
@@ -100,10 +102,17 @@ exports.update = async (req, res, next) => {
       date_available,
       tanggal_pengajuan,
       alasan_pembelian,
+      note,
       details,
     } = req.body;
     const result = await FormPermintaan.update(
-      { supplier_id, date_available, tanggal_pengajuan, alasan_pembelian },
+      {
+        supplier_id,
+        date_available,
+        tanggal_pengajuan,
+        alasan_pembelian,
+        note,
+      },
       { where: { id: id } }
     );
     if (details.length > 0) {
@@ -136,8 +145,10 @@ exports.generatePdf = async (req, res) => {
     let resultArray = [];
     for (const id of ids) {
       const data = await getByFormPermintaanId(id);
+      console.log("cek dta", data);
       let result = {
         submission_date: data.tanggal_pengajuan,
+        date_available: data.date_available,
         note: data.alasan_pembelian,
         supplier_id: data.supplier_id,
         supplier_name: data.nama_pt,
