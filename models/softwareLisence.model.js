@@ -37,6 +37,9 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       defaultValue: false,
     },
+    have_expired: {
+      type: Sequelize.STRING,
+    },
   });
 
   return SoftwareLisence;

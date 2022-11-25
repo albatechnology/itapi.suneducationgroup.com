@@ -96,6 +96,7 @@ exports.create = async (req, res) => {
           tanggal_aktif: lisence.tanggal_aktif,
           tanggal_expired: lisence.tanggal_expired,
           form_permintaan: lisence.form_permintaan,
+          have_expired: lisence.have_expired,
         };
         lisenceList.push(lisenceData);
         try {
