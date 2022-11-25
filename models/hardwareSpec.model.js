@@ -12,7 +12,6 @@ module.exports = (sequelize, Sequelize) => {
     },
     kode_inventori: {
       type: Sequelize.STRING,
-      unique: true,
     },
     seq_inventori: {
       type: Sequelize.INTEGER,
