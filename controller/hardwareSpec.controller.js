@@ -37,27 +37,37 @@ exports.getById = async (req, res) => {
   }
 };
 exports.create = async (req, res) => {
+  const {
+    nama_hardware,
+    kode_inventori,
+    seq_inventori,
+    consumable,
+    deskripsi,
+    spesifikasi,
+  } = req.body;
   try {
-    const {
-      nama_hardware,
-      kode_inventori,
-      seq_inventori,
-      consumable,
-      deskripsi,
-      spesifikasi,
-    } = req.body;
     const user_id = req.user.user_id;
-    const result = await HardwareSpec.create({
-      nama_hardware,
-      kode_inventori,
-      seq_inventori,
-      consumable,
-      stock_qty: 0,
-      deskripsi,
-      spesifikasi: JSON.stringify(spesifikasi),
-      create_user_id: user_id,
-    });
-    result.save();
+    if (consumable === "Non Consumable") {
+      const result = await HardwareSpec.create({
+        nama_hardware,
+        kode_inventori,
+        seq_inventori,
+        consumable,
+        stock_qty: 0,
+        deskripsi,
+        spesifikasi: JSON.stringify(spesifikasi),
+        create_user_id: user_id,
+      });
+      result.save();
+    } else {
+      const result = await HardwareSpec.create({
+        nama_hardware,
+        consumable,
+        deskripsi,
+        create_user_id: user_id,
+      });
+      result.save();
+    }
     res.json({
       error_code: 0,
       message: "SupplierVendor berhasil ditambahkan",
