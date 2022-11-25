@@ -32,6 +32,7 @@ exports.create = async (req, res) => {
   const img = req.file.path;
   const user_id = req.user.user_id;
   const listInventori = [];
+  console.log("cek req.files", req.file);
 
   if (!req.file) {
     const err = new Error("Image tidak boleh kosong");
@@ -94,6 +95,33 @@ exports.create = async (req, res) => {
     });
   } catch (e) {
     res.send(e);
+  }
+};
+
+exports.upload = (req, res) => {
+  const user_id = req.user.user_id;
+  let filename = "";
+  console.log("cek req.filessssss", req.files);
+  if (req.files) {
+    filename = req.files.filename.name;
+    const filePath = "/public/upload/opentickets/" + req.files.filename.name;
+    uploadPath = __dirname + "/.." + filePath;
+
+    req.files.filename.mv(uploadPath, async (err) => {
+      console.log(err);
+      if (err) return res.status(500).send(err);
+
+      res.send({
+        error_code: 0,
+        filename,
+        filePath,
+      });
+    });
+  } else {
+    res.send({
+      error_code: 1,
+      message: "Tidak ada file yang diupload",
+    });
   }
 };
 
