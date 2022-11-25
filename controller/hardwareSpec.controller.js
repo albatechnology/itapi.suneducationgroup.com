@@ -47,7 +47,7 @@ exports.create = async (req, res) => {
   } = req.body;
   try {
     const user_id = req.user.user_id;
-    if (consumable === true) {
+    if (consumable === false) {
       const result = await HardwareSpec.create({
         nama_hardware,
         kode_inventori,
