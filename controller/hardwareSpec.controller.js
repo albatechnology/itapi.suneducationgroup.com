@@ -4,15 +4,6 @@ const sequelize = db.sequelize;
 const { QueryTypes, json } = require("sequelize");
 
 exports.getAll = async (req, res) => {
-  // try {
-  //   const result = await HardwareSpec.findAll({
-  //     order: [["nama_hardware", "asc"]],
-  //   });
-  //   //console.log(req.user);
-  //   res.send(result);
-  // } catch (e) {
-  //   res.status(400).send(e);
-  // }
   try {
     const result = await sequelize.query(
       "select hardware_spesifikasis.*,(select count(hardware_inventoris.hardware_spesifikasi_id) from hardware_inventoris where hardware_inventoris.hardware_spesifikasi_id = hardware_spesifikasis.id) as software_count from hardware_spesifikasis",
@@ -37,20 +28,32 @@ exports.getById = async (req, res) => {
   }
 };
 exports.create = async (req, res) => {
-  const {
-    nama_hardware,
-    kode_inventori,
-    seq_inventori,
-    consumable,
-    deskripsi,
-    spesifikasi,
-  } = req.body;
+  let message = "";
   try {
+    const {
+      nama_hardware,
+      kode_inventori,
+      seq_inventori,
+      consumable,
+      deskripsi,
+      spesifikasi,
+    } = req.body;
     const user_id = req.user.user_id;
-    if (consumable === false) {
+    const ki = kode_inventori.trim();
+    if (!consumable) {
+      const KIResult = await HardwareSpec.findAll({
+        where: { kode_inventori: ki },
+      });
+      //      console.log("aaa", KIResult);
+      if (KIResult[0] !== undefined) {
+        message = "Kode Inventori telat terdaftar";
+      }
+    }
+    console.log("message", message);
+    if (message === "") {
       const result = await HardwareSpec.create({
         nama_hardware,
-        kode_inventori,
+        kode_inventori: ki,
         seq_inventori,
         consumable,
         stock_qty: 0,
@@ -59,19 +62,16 @@ exports.create = async (req, res) => {
         create_user_id: user_id,
       });
       result.save();
-    } else {
-      const result = await HardwareSpec.create({
-        nama_hardware,
-        consumable,
-        deskripsi,
-        create_user_id: user_id,
+      res.send({
+        error_code: 0,
+        message: "Hardware Spec berhasil ditambahkan",
       });
-      result.save();
+    } else {
+      res.send({
+        error_code: 1,
+        message,
+      });
     }
-    res.json({
-      error_code: 0,
-      message: "SupplierVendor berhasil ditambahkan",
-    });
   } catch (e) {
     res.status(400).send(e);
   }
@@ -81,7 +81,6 @@ exports.update = async (req, res) => {
     const {
       id,
       nama_hardware,
-      kode_inventori,
       seq_inventori,
       consumable,
       deskripsi,
@@ -91,7 +90,6 @@ exports.update = async (req, res) => {
     const result = await HardwareSpec.update(
       {
         nama_hardware,
-        kode_inventori,
         seq_inventori,
         consumable,
         deskripsi,
@@ -104,5 +102,15 @@ exports.update = async (req, res) => {
     res.status(500).send({
       message: "Error update SupplierVendor with id=" + id,
     });
+  }
+};
+exports.delete = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await HardwareSpec.destroy({ where: { id } });
+    const result = await HardwareSpec.findAll();
+    res.send(result);
+  } catch (e) {
+    res.status(400).send(e);
   }
 };
