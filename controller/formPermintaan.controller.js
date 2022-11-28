@@ -149,11 +149,11 @@ exports.generatePdf = async (req, res) => {
     let resultArray = [];
     for (const id of ids) {
       const data = await getByFormPermintaanId(id);
-      console.log("cek dta", data);
       let result = {
         submission_date: data.tanggal_pengajuan,
         date_available: data.date_available,
-        note: data.alasan_pembelian,
+        alasan_pembelian: data.alasan_pembelian,
+        note: data.note,
         supplier_id: data.supplier_id,
         supplier_name: data.nama_pt,
         details: data.details,
@@ -161,55 +161,10 @@ exports.generatePdf = async (req, res) => {
       resultArray.push(result);
     }
     res.send(resultArray);
-    console.log("cek payloadererererer", resultArray);
   } catch (e) {
     res.status(400).send(e);
   }
 };
-
-// exports.generatePdf = async (req, res) => {
-//   try {
-//     var now = new Date();
-//     doc.pipe(
-//       fs.createWriteStream(
-//         "./public/formpermintaan-" +
-//           now.getFullYear() +
-//           "-" +
-//           now.getMonth() +
-//           "-" +
-//           now.getDate() +
-//           ".pdf"
-//       )
-//     );
-//     doc.fontSize(27).text("Form Permintaan", 100, 100);
-//     doc
-//       .addPage()
-//       .fontSize(15)
-//       .text("Generating PDF with the help of pdfkit", 100, 100);
-
-//     // Apply some transforms and render an SVG path with the
-//     // 'even-odd' fill rule
-//     doc
-//       .scale(0.6)
-//       .translate(470, -380)
-//       .path("M 250,75 L 323,301 131,161 369,161 177,301 z")
-//       .fill("red", "even-odd")
-//       .restore();
-
-//     // Add some text with annotations
-//     doc
-//       .addPage()
-//       .fillColor("blue")
-//       .text("The link for GeeksforGeeks website", 100, 100)
-
-//       .link(100, 100, 160, 27, "https://www.geeksforgeeks.org/");
-
-//     // Finalize PDF file
-//     doc.end();
-//   } catch (e) {
-//     res.status(400).send(e);
-//   }
-// };
 
 exports.delete = async (req, res) => {
   try {
