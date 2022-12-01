@@ -13,7 +13,13 @@ module.exports = (sequelize, Sequelize) => {
     subject: {
       type: Sequelize.STRING,
     },
-    image: {
+    image1path: {
+      type: Sequelize.STRING,
+    },
+    image2path: {
+      type: Sequelize.STRING,
+    },
+    image3path: {
       type: Sequelize.STRING,
     },
     tanggal_pengajuan: {

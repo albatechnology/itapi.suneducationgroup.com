@@ -42,6 +42,10 @@ module.exports = (sequelize, Sequelize) => {
     spesifikasi: {
       type: Sequelize.TEXT,
     },
+    user_id: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
   });
 
   return HardwareInventori;

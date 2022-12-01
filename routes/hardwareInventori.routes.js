@@ -49,6 +49,15 @@ module.exports = (app) => {
   router.put("/", (req, res) => {
     hardwareInventori.update(req, res);
   });
+
+  router.get("/user/list", (req, res) => {
+    hardwareInventori.getUserList(req, res);
+  });
+
+  router.put("/:id/assign", (req, res) => {
+    hardwareInventori.assign_to(req, res);
+  });
+
   router.post("/assignforrepair", (req, res) => {
     hardwareInventori.assignForRepair(req, res);
   });

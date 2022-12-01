@@ -27,26 +27,56 @@ const {
 */
 
 exports.create = async (req, res) => {
+  // console.log("cek req bodyy", req.files["image1path"]);
+  // const user_id = req.user.user_id;
+  let image1path = "";
+  let image2path = "";
+  let image3path = "";
+  if (req.files["image1path"]) {
+    filename = req.files["image1path"].name;
+    image1path = "/public/upload/opentickets/" + filename;
+    uploadPath = __dirname + "/.." + image1path;
+    req.files["image1path"].mv(uploadPath, async (err) => {
+      if (err) return res.status(500).send(err);
+    });
+  }
+  if (req.files["image2path"]) {
+    filename = req.files["image2path"].name;
+    image2path = "/public/upload/opentickets/" + filename;
+    uploadPath = __dirname + "/.." + image2path;
+    req.files["image2path"].mv(uploadPath, async (err) => {
+      if (err) return res.status(500).send(err);
+    });
+  }
+  if (req.files["image3path"]) {
+    filename = req.files["image3path"].name;
+    image3path = "/public/upload/opentickets/" + filename;
+    uploadPath = __dirname + "/.." + image3path;
+    req.files["image3path"].mv(uploadPath, async (err) => {
+      if (err) return res.status(500).send(err);
+    });
+  }
+
   const { subject, jenis_perbaikan, tanggal_pengajuan, alasan, inventoris } =
     req.body;
-  const img = req.file.path;
+  const payload = {
+    subject,
+    jenis_perbaikan,
+    tanggal_pengajuan,
+    alasan,
+    inventoris,
+    image1path,
+    image2path,
+    image3path,
+  };
   const user_id = req.user.user_id;
   const listInventori = [];
-  console.log("cek req.files", req.file);
-
-  if (!req.file) {
-    const err = new Error("Image tidak boleh kosong");
-    err.errStatus = 422;
-    throw err;
-  }
 
   try {
     const ticketData = {
+      ...payload,
       jenis_ticket: "PERBAIKAN",
       subject,
-      tanggal_pengajuan,
-      alasan,
-      image: img,
       status: 1, // create
       create_user_id: user_id,
     };
@@ -64,27 +94,30 @@ exports.create = async (req, res) => {
     );
 
     // insert detail
-    inventoris.forEach(async (inventori) => {
-      const { inventori_id, keterangan } = inventori;
+    if (inventoris) {
+      inventoris.forEach(async (inventori) => {
+        const { inventori_id, keterangan } = inventori;
+        // get hardwareInventoriData
+        const hardwareInventoriResult = await HardwareInventori.findByPk(
+          inventori_id
+        );
+        if (hardwareInventoriResult) {
+          hardwareInventoriData = hardwareInventoriResult.dataValues;
 
-      // get hardwareInventoriData
-      const hardwareInventoriResult = await HardwareInventori.findByPk(
-        inventori_id
-      );
-      if (hardwareInventoriResult) {
-        hardwareInventoriData = hardwareInventoriResult.dataValues;
-
-        const inventoriData = {
-          ticket_id: ticketId,
-          inventori_id,
-          keterangan,
-          status: 1,
-          is_delete: 0,
-        };
-        inventoriResult = await TicketPerbaikanInventori.create(inventoriData);
-        listInventori.push(inventoriData);
-      }
-    });
+          const inventoriData = {
+            ticket_id: ticketId,
+            inventori_id,
+            keterangan,
+            status: 1,
+            is_delete: 0,
+          };
+          inventoriResult = await TicketPerbaikanInventori.create(
+            inventoriData
+          );
+          listInventori.push(inventoriData);
+        }
+      });
+    }
     res.send({
       error_code: 0,
       payload: {
@@ -95,33 +128,6 @@ exports.create = async (req, res) => {
     });
   } catch (e) {
     res.send(e);
-  }
-};
-
-exports.upload = (req, res) => {
-  const user_id = req.user.user_id;
-  let filename = "";
-  console.log("cek req.filessssss", req.files);
-  if (req.files) {
-    filename = req.files.filename.name;
-    const filePath = "/public/upload/opentickets/" + req.files.filename.name;
-    uploadPath = __dirname + "/.." + filePath;
-
-    req.files.filename.mv(uploadPath, async (err) => {
-      console.log(err);
-      if (err) return res.status(500).send(err);
-
-      res.send({
-        error_code: 0,
-        filename,
-        filePath,
-      });
-    });
-  } else {
-    res.send({
-      error_code: 1,
-      message: "Tidak ada file yang diupload",
-    });
   }
 };
 

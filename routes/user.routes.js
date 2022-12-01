@@ -12,7 +12,7 @@ module.exports = (app) => {
   router.get("/myinventory", (req, res) => {
     user.myInventori(req, res);
   });
-  router.get("/mypermintaaninventori", (req, res) => {
+  router.get("/:id/mypermintaaninventori", (req, res) => {
     user.myPermintaanInventori(req, res);
   });
   router.get("/mypeminjamaninventori", (req, res) => {

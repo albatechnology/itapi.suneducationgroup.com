@@ -44,12 +44,10 @@ exports.create = async (req, res) => {
       const KIResult = await HardwareSpec.findAll({
         where: { kode_inventori: ki },
       });
-      //      console.log("aaa", KIResult);
       if (KIResult[0] !== undefined) {
         message = "Kode Inventori telat terdaftar";
       }
     }
-    console.log("message", message);
     if (message === "") {
       const result = await HardwareSpec.create({
         nama_hardware,
@@ -86,7 +84,6 @@ exports.update = async (req, res) => {
       deskripsi,
       spesifikasi,
     } = req.body;
-    console.log(req.body);
     const result = await HardwareSpec.update(
       {
         nama_hardware,

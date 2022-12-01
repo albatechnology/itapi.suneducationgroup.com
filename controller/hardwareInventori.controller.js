@@ -1,6 +1,7 @@
 const db = require("../models");
 const HardwareInventori = db.HardwareInventori;
 const HardwareInventoriLisence = db.HardwareInventoriLisence;
+const LoginData = db.LoginData;
 const HardwareSpec = db.HardwareSpec;
 const sequelize = db.sequelize;
 const { QueryTypes, json } = require("sequelize");
@@ -12,7 +13,6 @@ exports.getAll = async (req, res) => {
     const result = await HardwareInventori.findAll({
       order: [["no_asset", "asc"]],
     });
-    //console.log(req.user);
     res.send(result);
   } catch (e) {
     res.status(400).send(e);
@@ -129,7 +129,7 @@ exports.getByHardwareSpecId = async (req, res) => {
   const hardwareSpecId = req.params.id;
   try {
     const result = await sequelize.query(
-      "select hardware_inventoris.*,hardware_spesifikasis.nama_hardware,(select login_data.fullname from login_data where login_data.user_id = (select hardware_assigns.user_id from hardware_assigns where hardware_assigns.hardware_inventori_id =  hardware_inventoris.id and hardware_assigns.status <> 0 order by id limit 0,1 ) ) as assign_to,(select hardware_assigns.status from hardware_assigns where hardware_assigns.hardware_inventori_id =  hardware_inventoris.id and (hardware_assigns.status = 4 or hardware_assigns.status = 5 or hardware_assigns.status = 6) limit 0,1 )  as assign_status from hardware_inventoris join hardware_spesifikasis on hardware_spesifikasis.id = hardware_inventoris.hardware_spesifikasi_id where hardware_inventoris.hardware_spesifikasi_id = ?  ",
+      "select hardware_inventoris.*, hardware_spesifikasis.nama_hardware, ( select login_data.fullname from login_data where login_data.user_id = hardware_inventoris.user_id ) as assign_to, ( select hardware_assigns.status from hardware_assigns where hardware_assigns.hardware_inventori_id = hardware_inventoris.id and ( hardware_assigns.status = 4 or hardware_assigns.status = 5 or hardware_assigns.status = 6 ) limit 0, 1 ) as assign_status from hardware_inventoris join hardware_spesifikasis on hardware_spesifikasis.id = hardware_inventoris.hardware_spesifikasi_id where hardware_inventoris.hardware_spesifikasi_id = ?  ",
       {
         replacements: [hardwareSpecId],
         type: QueryTypes.SELECT,
@@ -216,14 +216,12 @@ exports.update = async (req, res) => {
   //const hardwareSpecId = inventori.hardwareSpecId;
 
   const hardwareSpecId = inventori.hardware_spesifikasi_id;
-  //console.log(inventori);
   let hardwareSpecData = null;
   try {
     hardwareSpecData = await HardwareSpec.findByPk(hardwareSpecId);
   } catch (e) {
     res.status(400).send(e);
   }
-  //console.log(hardwareSpecData);
   if (hardwareSpecData) {
     const inventoriData = {
       hardware_spesifikasi_id: inventori.hardwareSpecId,
@@ -252,6 +250,50 @@ exports.update = async (req, res) => {
     }
   }
 };
+
+exports.getUserList = async (req, res) => {
+  try {
+    const result = await LoginData.findAll({
+      order: [["createdAt", "DESC"]],
+    });
+    res.send(result);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};
+
+exports.assign_to = async (req, res) => {
+  try {
+    if (req.body.user_id) {
+      const updateHardwareIventori = await HardwareInventori.update(
+        {
+          user_id: req.body.user_id,
+        },
+        {
+          where: { id: req.params.id },
+        }
+      );
+
+      if (updateHardwareIventori[0] === 1) {
+        return res.status(200).send({
+          status: "success",
+        });
+      } else {
+        return res.status(400).send({
+          status: "Invalid hardware_inventori_id",
+        });
+      }
+    }
+
+    return res.status(400).send({
+      status: "error",
+      message: "User ID is empty!",
+    });
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};
+
 exports.assignForRepair = async (req, res) => {
   const inventori = req.body;
   const user_id = req.user.user_id;
@@ -321,7 +363,6 @@ exports.addLisence = async (req, res) => {
         message: "data tidak ditemukan",
       };
     }
-    //console.log(payload);
 
     res.send(payload);
   } catch (e) {
@@ -332,7 +373,6 @@ exports.addLisence = async (req, res) => {
 exports.removeLisence = async (req, res) => {
   const { inventori_id, lisence_id } = req.body;
   const user_id = req.user.user_id;
-  console.log(req.body);
   try {
     await HardwareInventoriLisence.update(
       {
@@ -374,7 +414,6 @@ exports.removeLisence = async (req, res) => {
         message: "data tidak ditemukan",
       };
     }
-    //console.log(payload);
     res.send(payload);
   } catch (e) {
     res.status(400).send(e);

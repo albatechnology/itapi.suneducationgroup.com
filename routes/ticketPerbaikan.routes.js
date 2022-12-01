@@ -10,6 +10,11 @@ module.exports = (app) => {
   router.post("/", (req, res) => {
     ticketPerbaikan.create(req, res);
   });
+
+  router.post("/upload", (req, res) => {
+    ticketPerbaikan.upload(req, res);
+  });
+
   router.put("/", (req, res) => {
     ticketPerbaikan.edit(req, res);
   });
