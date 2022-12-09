@@ -5,6 +5,7 @@ const TicketPerbaikanInventori = db.TicketPerbaikanInventori;
 const TicketPerbaikanPeminjaman = db.TicketPerbaikanPeminjaman;
 
 const sequelize = db.sequelize;
+var fs = require("fs");
 const { QueryTypes, Op } = require("sequelize");
 const {
   HardwareSpec,
@@ -27,44 +28,51 @@ const {
 */
 
 exports.create = async (req, res) => {
-  // console.log("cek req bodyy", req.files["image1path"]);
-  // const user_id = req.user.user_id;
   let image1path = "";
   let image2path = "";
   let image3path = "";
-  if (req.files["image1path"]) {
-    filename = req.files["image1path"].name;
-    image1path = "/public/upload/opentickets/" + filename;
-    uploadPath = __dirname + "/.." + image1path;
-    req.files["image1path"].mv(uploadPath, async (err) => {
-      if (err) return res.status(500).send(err);
-    });
-  }
-  if (req.files["image2path"]) {
-    filename = req.files["image2path"].name;
-    image2path = "/public/upload/opentickets/" + filename;
-    uploadPath = __dirname + "/.." + image2path;
-    req.files["image2path"].mv(uploadPath, async (err) => {
-      if (err) return res.status(500).send(err);
-    });
-  }
-  if (req.files["image3path"]) {
-    filename = req.files["image3path"].name;
-    image3path = "/public/upload/opentickets/" + filename;
-    uploadPath = __dirname + "/.." + image3path;
-    req.files["image3path"].mv(uploadPath, async (err) => {
-      if (err) return res.status(500).send(err);
-    });
+  if (!req.files == undefined) {
+    if (!req.files["image1path"] == undefined) {
+      filename = req.files["image1path"].name;
+      image1path = "public/upload/opentickets/" + filename;
+      uploadPath = __dirname + "/../" + image1path;
+      req.files["image1path"].mv(uploadPath, async (err) => {
+        if (err) return res.status(500).send(err);
+      });
+    }
+    if (!req.files["image2path"] == undefined) {
+      filename = req.files["image2path"].name;
+      image2path = "public/upload/opentickets/" + filename;
+      uploadPath = __dirname + "/../" + image2path;
+      req.files["image2path"].mv(uploadPath, async (err) => {
+        if (err) return res.status(500).send(err);
+      });
+    }
+    if (!req.files["image3path"] == undefined) {
+      filename = req.files["image3path"].name;
+      image3path = "public/upload/opentickets/" + filename;
+      uploadPath = __dirname + "/../" + image3path;
+      req.files["image3path"].mv(uploadPath, async (err) => {
+        if (err) return res.status(500).send(err);
+      });
+    }
   }
 
-  const { subject, jenis_perbaikan, tanggal_pengajuan, alasan, inventoris } =
-    req.body;
-  const payload = {
+  const {
     subject,
+    jenis_ticket,
     jenis_perbaikan,
     tanggal_pengajuan,
     alasan,
     inventoris,
+  } = req.body;
+
+  const payload = {
+    subject,
+    jenis_ticket,
+    jenis_perbaikan,
+    tanggal_pengajuan,
+    alasan,
     image1path,
     image2path,
     image3path,
@@ -75,7 +83,6 @@ exports.create = async (req, res) => {
   try {
     const ticketData = {
       ...payload,
-      jenis_ticket: "PERBAIKAN",
       subject,
       status: 1, // create
       create_user_id: user_id,
@@ -101,6 +108,7 @@ exports.create = async (req, res) => {
         const hardwareInventoriResult = await HardwareInventori.findByPk(
           inventori_id
         );
+
         if (hardwareInventoriResult) {
           hardwareInventoriData = hardwareInventoriResult.dataValues;
 
@@ -132,17 +140,101 @@ exports.create = async (req, res) => {
 };
 
 exports.edit = async (req, res) => {
-  const { ticket, user } = req.body;
-  const user_id = req.user.user_id;
-  const ticketId = ticket.id;
-  const inventoris = ticket.inventoris;
+  const ticket_id = req.params.id;
+  const t_result = await Ticket.findByPk(ticket_id);
+  const ticketId = t_result.id;
   try {
-    if (ticket.jenis_ticket === "PERBAIKAN") {
-      if (user === "USER" && ticket.status === 1) {
-        // delete details
-        const inventorisDeleteResult = await TicketPerbaikanInventori.destroy({
-          where: { ticket_id: ticketId },
-        });
+    if (t_result.jenis_ticket === "PERBAIKAN") {
+      // if (user === "ADMIN" && t_result.status === 1) {
+      const imageResult = await Ticket.findByPk(ticketId);
+      let image1path = imageResult.image1path;
+      let image2path = imageResult.image2path;
+      let image3path = imageResult.image3path;
+
+      let newPath1 = "";
+      let newPath2 = "";
+      let newPath3 = "";
+
+      if (!req.files == undefined) {
+        if (!req.files["image1path"] == undefined) {
+          req_image1path = req.files.req_image1path;
+          fs.unlink(image1path, (err) => {
+            if (err) console.log(err);
+            else {
+              console.log(`\nDeleted file: ${image1path}`);
+            }
+          });
+          filename = req_image1path.name;
+          newPath1 = "public/upload/opentickets/" + filename;
+          uploadPath = __dirname + "/../" + newPath1;
+          req_image1path.mv(uploadPath, async (err) => {
+            if (err) return res.status(500).send(err);
+          });
+        }
+
+        if (!req.files["image2path"] == undefined) {
+          req_image2path = req.files.req_image2path;
+          fs.unlink(image2path, (err) => {
+            if (err) console.log(err);
+            else {
+              console.log(`\nDeleted file: ${image2path}`);
+            }
+          });
+          filename = req_image2path.name;
+          newPath2 = "public/upload/opentickets/" + filename;
+          uploadPath = __dirname + "/../" + newPath2;
+          req_image2path.mv(uploadPath, async (err) => {
+            if (err) return res.status(500).send(err);
+          });
+        }
+
+        if (!req.files["image3path"] == undefined) {
+          req_image3path = req.files.req_image3path;
+          fs.unlink(image3path, (err) => {
+            if (err) console.log(err);
+            else {
+              console.log(`\nDeleted file: ${image3path}`);
+            }
+          });
+          filename = req_image3path.name;
+          newPath3 = "public/upload/opentickets/" + filename;
+          uploadPath = __dirname + "/../" + newPath3;
+          req_image3path.mv(uploadPath, async (err) => {
+            if (err) return res.status(500).send(err);
+          });
+        }
+      }
+
+      const {
+        subject,
+        jenis_perbaikan,
+        tanggal_pengajuan,
+        alasan,
+        inventoris,
+      } = req.body;
+      const payload = {
+        subject,
+        jenis_perbaikan,
+        tanggal_pengajuan,
+        alasan,
+        inventoris,
+        image1path: newPath1,
+        image2path: newPath2,
+        image3path: newPath3,
+      };
+
+      ticketResult = Ticket.update(payload, {
+        where: { id: ticketId },
+      });
+
+      const listInventori = [];
+
+      // delete details
+      const inventorisDeleteResult = await TicketPerbaikanInventori.destroy({
+        where: { ticket_id: ticketId },
+      });
+
+      if (inventoris) {
         inventoris.forEach(async (inventori, index) => {
           const { inventori_id, keterangan } = inventori;
 
@@ -162,39 +254,19 @@ exports.edit = async (req, res) => {
             inventoriResult = await TicketPerbaikanInventori.create(
               inventoriData
             );
-            //listInventori.push(inventoriData);
+            listInventori.push(inventoriData);
           }
         });
       }
-      if (user === "ADMIN" && ticket.status === 1) {
-        // delete details
-        inventoris.forEach(async (inventori, index) => {
-          const { id, inventori_id, keterangan } = inventori;
-          if (!id) {
-            const hardwareInventoriResult = await HardwareInventori.findByPk(
-              inventori_id
-            );
-            if (hardwareInventoriResult) {
-              hardwareInventoriData = hardwareInventoriResult.dataValues;
-
-              const inventoriData = {
-                ticket_id: ticketId,
-                inventori_id,
-                keterangan,
-                status: 1,
-                is_delete: 0,
-              };
-              inventoriResult = await TicketPerbaikanInventori.create(
-                inventoriData
-              );
-              //listInventori.push(inventoriData);
-            }
-          }
-        });
-      }
+      res.send({
+        error_code: 0,
+        payload: {
+          ticket_id: ticketId,
+          ticket: ticketData,
+          inventoris: listInventori,
+        },
+      });
     }
-    const payload = await getTicketData(ticket);
-    res.send(payload);
   } catch (e) {
     res.send(e);
   }
@@ -276,7 +348,6 @@ exports.processRepairInventori = async (req, res) => {
 exports.assignReplaceInventori = async (req, res) => {
   const { hardwareInventoriId, perbaikanInventoriId } = req.body;
   const user_id = req.user.user_id;
-  console.log("req body", req.body);
   let ticketId = 0;
   let inventori = {};
   let payload = {};
@@ -794,7 +865,6 @@ const getTicketData = async (ticket) => {
         }
       );
       payload = { ...resTicket[0], inventoris, messages };
-      console.log("payload", payload);
     }
   }
 

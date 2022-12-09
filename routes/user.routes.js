@@ -9,13 +9,13 @@ module.exports = (app) => {
     user.userData(req, res);
   });
 
-  router.get("/myinventory", (req, res) => {
+  router.get("/:id/myinventory", (req, res) => {
     user.myInventori(req, res);
   });
   router.get("/:id/mypermintaaninventori", (req, res) => {
     user.myPermintaanInventori(req, res);
   });
-  router.get("/mypeminjamaninventori", (req, res) => {
+  router.get("/:id/mypeminjamaninventori", (req, res) => {
     user.myPeminjamanInventori(req, res);
   });
 

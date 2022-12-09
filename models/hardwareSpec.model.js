@@ -12,9 +12,12 @@ module.exports = (sequelize, Sequelize) => {
     },
     kode_inventori: {
       type: Sequelize.STRING,
+      unique: true,
+      allowNull: false,
     },
     seq_inventori: {
       type: Sequelize.INTEGER,
+      allowNull: false,
     },
     consumable: {
       type: Sequelize.BOOLEAN,

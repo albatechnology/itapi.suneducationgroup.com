@@ -15,7 +15,7 @@ module.exports = (app) => {
     ticketPerbaikan.upload(req, res);
   });
 
-  router.put("/", (req, res) => {
+  router.put("/:id", (req, res) => {
     ticketPerbaikan.edit(req, res);
   });
   router.post("/processinventori", (req, res) => {

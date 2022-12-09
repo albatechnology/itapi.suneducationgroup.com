@@ -1,4 +1,5 @@
 const db = require("../models");
+const HardwareAssign = db.HardwareAssign;
 const HardwareInventori = db.HardwareInventori;
 const HardwareInventoriLisence = db.HardwareInventoriLisence;
 const LoginData = db.LoginData;
@@ -6,7 +7,7 @@ const HardwareSpec = db.HardwareSpec;
 const sequelize = db.sequelize;
 const { QueryTypes, json } = require("sequelize");
 const { hardwareSpec } = require(".");
-const { HardwareAssign } = require("../models");
+// const { HardwareAssign } = require("../models");
 
 exports.getAll = async (req, res) => {
   try {
@@ -71,10 +72,13 @@ exports.getAvailable = async (req, res) => {
   }
 };
 exports.getAssigned = async (req, res) => {
+  const user_id = req.user.user_id;
+
   try {
     const result = await sequelize.query(
-      "select * from hardware_inventoris where id in (select hardware_inventori_id from hardware_assigns where status = 2)",
+      "select * from hardware_inventoris where id in (select hardware_inventori_id from hardware_assigns where user_id = ? AND status = 2)",
       {
+        replacements: [user_id],
         type: QueryTypes.SELECT,
       }
     );
@@ -265,7 +269,7 @@ exports.getUserList = async (req, res) => {
 exports.assign_to = async (req, res) => {
   try {
     if (req.body.user_id) {
-      const updateHardwareIventori = await HardwareInventori.update(
+      const updateHardwareInventory = await HardwareInventori.update(
         {
           user_id: req.body.user_id,
         },
@@ -273,8 +277,20 @@ exports.assign_to = async (req, res) => {
           where: { id: req.params.id },
         }
       );
+      // create assign into hardware_assign table
+      const hardwareAssignData = {
+        user_id: req.body.user_id,
+        hardware_inventori_id: req.params.id,
+        status: 2,
+      };
 
-      if (updateHardwareIventori[0] === 1) {
+      const hardwareAssignCreateResult = await HardwareAssign.create(
+        hardwareAssignData
+      );
+
+      hardwareAssignCreateResult.save();
+
+      if (updateHardwareInventory[0] === 1) {
         return res.status(200).send({
           status: "success",
         });
