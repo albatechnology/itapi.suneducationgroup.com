@@ -31,8 +31,8 @@ exports.create = async (req, res) => {
   let image1path = "";
   let image2path = "";
   let image3path = "";
-  if (!req.files == undefined) {
-    if (!req.files["image1path"] == undefined) {
+  if (req.files !== undefined) {
+    if (req.files["image1path"] !== undefined) {
       filename = req.files["image1path"].name;
       image1path = "public/upload/opentickets/" + filename;
       uploadPath = __dirname + "/../" + image1path;
@@ -40,7 +40,7 @@ exports.create = async (req, res) => {
         if (err) return res.status(500).send(err);
       });
     }
-    if (!req.files["image2path"] == undefined) {
+    if (req.files["image2path"] !== undefined) {
       filename = req.files["image2path"].name;
       image2path = "public/upload/opentickets/" + filename;
       uploadPath = __dirname + "/../" + image2path;
@@ -48,7 +48,7 @@ exports.create = async (req, res) => {
         if (err) return res.status(500).send(err);
       });
     }
-    if (!req.files["image3path"] == undefined) {
+    if (req.files["image3path"] !== undefined) {
       filename = req.files["image3path"].name;
       image3path = "public/upload/opentickets/" + filename;
       uploadPath = __dirname + "/../" + image3path;
