@@ -7,12 +7,15 @@ module.exports = (app) => {
   });
 
   router.get("/", (req, res) => {
-    console.log(req.body);
     hardwareSpec.getAll(req, res);
   });
+
   router.get("/:id", (req, res) => {
-    console.log(req.body);
     hardwareSpec.getById(req, res);
+  });
+
+  router.get("/:id/specifications", (req, res) => {
+    hardwareSpec.getProductSpecifications(req, res);
   });
 
   router.post("/", (req, res) => {
@@ -22,7 +25,6 @@ module.exports = (app) => {
     hardwareSpec.delete(req, res);
   });
   router.put("/", (req, res) => {
-    console.log(req.body);
     hardwareSpec.update(req, res);
   });
 

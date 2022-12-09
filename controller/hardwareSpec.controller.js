@@ -1,5 +1,6 @@
 const db = require("../models");
 const HardwareSpec = db.HardwareSpec;
+const ProductSpecification = db.ProductSpecification;
 const sequelize = db.sequelize;
 const { QueryTypes, json } = require("sequelize");
 
@@ -27,6 +28,28 @@ exports.getById = async (req, res) => {
     });
   }
 };
+
+exports.getProductSpecifications = async (req, res) => {
+  try {
+    const name = req.query.name.toLowerCase();
+    const type = req.query.type;
+
+    const result = await sequelize.query(
+      "select * from specifications where name like '%" +
+        name +
+        "%' AND type='" +
+        type +
+        "' limit 10",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    res.send(result);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};
+
 exports.create = async (req, res) => {
   let message = "";
   try {
