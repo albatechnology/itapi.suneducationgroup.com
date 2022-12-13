@@ -27,36 +27,45 @@ const {
 
 */
 
+makeUniqueId = (length) => {
+  var result = "";
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 exports.create = async (req, res) => {
   let image1path = "";
   let image2path = "";
   let image3path = "";
-  if (req.files !== undefined) {
-    if (req.files["image1path"] !== undefined) {
-      filename = req.files["image1path"].name;
-      image1path = "public/upload/opentickets/" + filename;
-      uploadPath = __dirname + "/../" + image1path;
-      req.files["image1path"].mv(uploadPath, async (err) => {
-        if (err) return res.status(500).send(err);
-      });
-    }
-    if (req.files["image2path"] !== undefined) {
-      filename = req.files["image2path"].name;
-      image2path = "public/upload/opentickets/" + filename;
-      uploadPath = __dirname + "/../" + image2path;
-      req.files["image2path"].mv(uploadPath, async (err) => {
-        if (err) return res.status(500).send(err);
-      });
-    }
-    if (req.files["image3path"] !== undefined) {
-      filename = req.files["image3path"].name;
-      image3path = "public/upload/opentickets/" + filename;
-      uploadPath = __dirname + "/../" + image3path;
-      req.files["image3path"].mv(uploadPath, async (err) => {
-        if (err) return res.status(500).send(err);
-      });
-    }
+  // console.log("cek req body", req.body.image1path);
+  // if (req.body !== undefined) {
+  if (req.body.image1path) {
+    fileraw = req.body.image1path;
+    let buff = new Buffer.from(fileraw, "base64");
+    const image1name = `openticketsimage${makeUniqueId(10)}.png`;
+    fs.writeFileSync(`public/upload/opentickets/${image1name}`, buff);
+    image1path = "public/upload/opentickets/" + image1name;
   }
+  if (req.body.image2path) {
+    fileraw = req.body.image2path;
+    let buff = new Buffer.from(fileraw, "base64");
+    const image2name = `openticketsimage${makeUniqueId(10)}.png`;
+    fs.writeFileSync(`public/upload/opentickets/${image2name}`, buff);
+    image2path = "public/upload/opentickets/" + image2name;
+  }
+  if (req.body.image3path) {
+    fileraw = req.body.image3path;
+    let buff = new Buffer.from(fileraw, "base64");
+    const image3name = `openticketsimage${makeUniqueId(10)}.png`;
+    fs.writeFileSync(`public/upload/opentickets/${image3name}`, buff);
+    image3path = "public/upload/opentickets/" + image3name;
+  }
+  // }
 
   const {
     subject,
@@ -78,7 +87,7 @@ exports.create = async (req, res) => {
     image3path,
   };
   const user_id = req.user.user_id;
-  const listInventori = [];
+  let listInventori = [];
 
   try {
     const ticketData = {
@@ -96,18 +105,18 @@ exports.create = async (req, res) => {
       ticket_id: ticketId,
       jenis_perbaikan,
     };
+
     const ticketPerbaikanResult = await TicketPerbaikan.create(
       ticketPerbaikanData
     );
 
     // insert detail
     if (inventoris) {
-      inventoris.forEach(async (inventori) => {
+      inventoris.forEach((inventori) => {
         const { inventori_id, keterangan } = inventori;
         // get hardwareInventoriData
-        const hardwareInventoriResult = await HardwareInventori.findByPk(
-          inventori_id
-        );
+        const hardwareInventoriResult =
+          HardwareInventori.findByPk(inventori_id);
 
         if (hardwareInventoriResult) {
           hardwareInventoriData = hardwareInventoriResult.dataValues;
@@ -119,13 +128,12 @@ exports.create = async (req, res) => {
             status: 1,
             is_delete: 0,
           };
-          inventoriResult = await TicketPerbaikanInventori.create(
-            inventoriData
-          );
+          inventoriResult = TicketPerbaikanInventori.create(inventoriData);
           listInventori.push(inventoriData);
         }
       });
     }
+
     res.send({
       error_code: 0,
       payload: {
