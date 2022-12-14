@@ -22,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
     },
     tanggal_pengajuan: {
-      type: Sequelize.DATEONLY,
+      type: Sequelize.DATE,
     },
     alasan: {
       type: Sequelize.STRING,
