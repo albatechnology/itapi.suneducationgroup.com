@@ -8,7 +8,6 @@ module.exports = (sequelize, Sequelize) => {
     },
     jenis_ticket: {
       type: Sequelize.STRING,
-      allowNull: false,
     },
     subject: {
       type: Sequelize.STRING,
@@ -24,7 +23,6 @@ module.exports = (sequelize, Sequelize) => {
     },
     tanggal_pengajuan: {
       type: Sequelize.DATEONLY,
-      allowNull: false,
     },
     alasan: {
       type: Sequelize.STRING,
