@@ -15,7 +15,7 @@ module.exports = (app) => {
     //console.log(req.body);
     hardwareInventori.getAvailable(req, res);
   });
-  router.get("/assigned", (req, res) => {
+  router.get("/:id/assigned", (req, res) => {
     //console.log(req.body);
     hardwareInventori.getAssigned(req, res);
   });
@@ -60,6 +60,10 @@ module.exports = (app) => {
 
   router.post("/assignforrepair", (req, res) => {
     hardwareInventori.assignForRepair(req, res);
+  });
+
+  router.get("/channels/list", (req, res) => {
+    hardwareInventori.getAllChannel(req, res);
   });
 
   app.use("/api/hardwareinventori", router);

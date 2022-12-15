@@ -3,6 +3,7 @@ const HardwareAssign = db.HardwareAssign;
 const HardwareInventori = db.HardwareInventori;
 const HardwareInventoriLisence = db.HardwareInventoriLisence;
 const LoginData = db.LoginData;
+const ChannelData = db.ChannelData;
 const HardwareSpec = db.HardwareSpec;
 const sequelize = db.sequelize;
 const { QueryTypes, json } = require("sequelize");
@@ -71,6 +72,18 @@ exports.getAvailable = async (req, res) => {
     res.status(400).send(e);
   }
 };
+
+exports.getAllChannel = async (req, res) => {
+  try {
+    const result = await ChannelData.findAll({
+      order: [["id", "asc"]],
+    });
+    res.send(result);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};
+
 exports.getAssigned = async (req, res) => {
   const user_id = req.user.user_id;
 

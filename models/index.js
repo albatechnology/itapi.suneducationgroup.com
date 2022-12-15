@@ -16,6 +16,7 @@ db.sequelize = sequelize;
 
 db.authentication = require("./authentication.model.js")(sequelize, Sequelize);
 db.LoginData = require("./loginData.model")(sequelize, Sequelize);
+db.ChannelData = require("./channel.model")(sequelize, Sequelize);
 db.MailingList = require("./mailingList.model")(sequelize, Sequelize);
 db.MailingListMember = require("./mailingListMember.model")(
   sequelize,
@@ -32,6 +33,10 @@ db.SupplierVendorCategory = require("./suppliervendorcategory.model")(
   Sequelize
 );
 db.HardwareSpec = require("./hardwareSpec.model")(sequelize, Sequelize);
+db.ProductSpecification = require("./specifications.model")(
+  sequelize,
+  Sequelize
+);
 db.HardwareInventori = require("./hardwareInventori.model")(
   sequelize,
   Sequelize

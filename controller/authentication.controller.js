@@ -2,6 +2,7 @@ require("dotenv").config();
 const fetch = require("node-fetch");
 const db = require("../models");
 const LoginData = db.LoginData;
+const ChannelData = db.ChannelData;
 const jwt = require("jsonwebtoken");
 
 async function authentication(apiReq, apiRes) {
@@ -83,6 +84,36 @@ async function authentication(apiReq, apiRes) {
           where: { user_id: userData.user_id },
         });
       }
+
+      // CREATE channels start
+
+      if ((cabang_id = json_data.payload.cabang.cabang_id)) {
+        let checkData = await ChannelData.findAll({
+          where: { id: cabang_id },
+        });
+        if (checkData.length > 0) {
+          let channelData = {
+            name: json_data.payload.user_data.username,
+            code: json_data.payload.cabang.cabang_code,
+            is_franchise: json_data.payload.cabang.is_franchise,
+          };
+          const updateResult = ChannelData.update(channelData, {
+            where: { id: cabang_id },
+          });
+        } else {
+          let channelData = {
+            id: json_data.payload.cabang.cabang_id,
+            name: json_data.payload.user_data.username,
+            code: json_data.payload.cabang.cabang_code,
+            is_franchise: json_data.payload.cabang.is_franchise,
+          };
+          const channelResult = ChannelData.create(channelData);
+          channelResult.save();
+        }
+      }
+
+      // CREATE channels end
+
       const newUserData = {
         ...userData,
         supervisor_username: supervisorData.username,
