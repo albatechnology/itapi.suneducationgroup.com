@@ -28,7 +28,8 @@ const {
 */
 
 makeUniqueId = (length) => {
-  var result = "";
+  var datetime = new Date();
+  var result = "" + datetime.toISOString().slice(0, 10);
   var characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   var charactersLength = characters.length;
@@ -43,38 +44,46 @@ exports.create = async (req, res) => {
   let image2path = "";
   let image3path = "";
   // console.log("cek req body", req.body.image1path);
-  // if (req.body !== undefined) {
-  if (req.body.image1path) {
-    fileraw = req.body.image1path;
-    let buff = new Buffer.from(fileraw, "base64");
-    const image1name = `openticketsimage${makeUniqueId(10)}.png`;
-    fs.writeFileSync(`public/upload/opentickets/${image1name}`, buff);
-    image1path = "public/upload/opentickets/" + image1name;
-  }
-  if (req.body.image2path) {
-    fileraw = req.body.image2path;
-    let buff = new Buffer.from(fileraw, "base64");
-    const image2name = `openticketsimage${makeUniqueId(10)}.png`;
-    fs.writeFileSync(`public/upload/opentickets/${image2name}`, buff);
-    image2path = "public/upload/opentickets/" + image2name;
-  }
-  if (req.body.image3path) {
-    fileraw = req.body.image3path;
-    let buff = new Buffer.from(fileraw, "base64");
-    const image3name = `openticketsimage${makeUniqueId(10)}.png`;
-    fs.writeFileSync(`public/upload/opentickets/${image3name}`, buff);
-    image3path = "public/upload/opentickets/" + image3name;
-  }
-  // }
 
-  const {
-    subject,
-    jenis_ticket,
-    jenis_perbaikan,
-    tanggal_pengajuan,
-    alasan,
-    inventoris,
-  } = req.body;
+  let newestArr = [];
+  for (let keyObj in req.body) {
+    if (Array.isArray(req.body[keyObj])) {
+      newestArr = req.body[keyObj];
+    }
+  }
+  let inventoris = newestArr.map((ar) => {
+    return JSON.parse(ar);
+  });
+
+  if (req.files !== undefined) {
+    if (req.files["image1path"] !== undefined) {
+      filename = req.files["image1path"].name;
+      image1path = "public/upload/opentickets/" + filename;
+      uploadPath = __dirname + "/../" + image1path;
+      req.files["image1path"].mv(uploadPath, async (err) => {
+        if (err) return res.status(500).send(err);
+      });
+    }
+    if (req.files["image2path"] !== undefined) {
+      filename = req.files["image2path"].name;
+      image2path = "public/upload/opentickets/" + filename;
+      uploadPath = __dirname + "/../" + image2path;
+      req.files["image2path"].mv(uploadPath, async (err) => {
+        if (err) return res.status(500).send(err);
+      });
+    }
+    if (req.files["image3path"] !== undefined) {
+      filename = req.files["image3path"].name;
+      image3path = "public/upload/opentickets/" + filename;
+      uploadPath = __dirname + "/../" + image3path;
+      req.files["image3path"].mv(uploadPath, async (err) => {
+        if (err) return res.status(500).send(err);
+      });
+    }
+  }
+
+  const { subject, jenis_ticket, jenis_perbaikan, tanggal_pengajuan, alasan } =
+    req.body;
 
   const payload = {
     subject,
