@@ -172,6 +172,16 @@ exports.edit = async (req, res) => {
       let newPath2 = "";
       let newPath3 = "";
 
+      let newestArr = [];
+      for (let keyObj in req.body) {
+        if (Array.isArray(req.body[keyObj])) {
+          newestArr = req.body[keyObj];
+        }
+      }
+      let inventoris = newestArr.map((ar) => {
+        return JSON.parse(ar);
+      });
+
       if (!req.files == undefined) {
         if (!req.files["image1path"] == undefined) {
           req_image1path = req.files.req_image1path;
@@ -222,13 +232,7 @@ exports.edit = async (req, res) => {
         }
       }
 
-      const {
-        subject,
-        jenis_perbaikan,
-        tanggal_pengajuan,
-        alasan,
-        inventoris,
-      } = req.body;
+      const { subject, jenis_perbaikan, tanggal_pengajuan, alasan } = req.body;
       const payload = {
         subject,
         jenis_perbaikan,
