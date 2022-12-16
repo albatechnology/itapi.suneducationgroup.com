@@ -58,7 +58,7 @@ exports.create = async (req, res) => {
   if (req.files !== undefined) {
     if (req.files["image1path"] !== undefined) {
       filename = req.files["image1path"].name;
-      image1path = "public/upload/opentickets/" + filename;
+      image1path = `public/upload/opentickets/${makeUniqueId(10)}${filename}`;
       uploadPath = __dirname + "/../" + image1path;
       req.files["image1path"].mv(uploadPath, async (err) => {
         if (err) return res.status(500).send(err);
@@ -66,7 +66,7 @@ exports.create = async (req, res) => {
     }
     if (req.files["image2path"] !== undefined) {
       filename = req.files["image2path"].name;
-      image2path = "public/upload/opentickets/" + filename;
+      image2path = `public/upload/opentickets/${makeUniqueId(10)}${filename}`;
       uploadPath = __dirname + "/../" + image2path;
       req.files["image2path"].mv(uploadPath, async (err) => {
         if (err) return res.status(500).send(err);
@@ -74,7 +74,7 @@ exports.create = async (req, res) => {
     }
     if (req.files["image3path"] !== undefined) {
       filename = req.files["image3path"].name;
-      image3path = "public/upload/opentickets/" + filename;
+      image3path = `public/upload/opentickets/${makeUniqueId(10)}${filename}`;
       uploadPath = __dirname + "/../" + image3path;
       req.files["image3path"].mv(uploadPath, async (err) => {
         if (err) return res.status(500).send(err);
@@ -182,9 +182,9 @@ exports.edit = async (req, res) => {
         return JSON.parse(ar);
       });
 
-      if (!req.files == undefined) {
-        if (!req.files["image1path"] == undefined) {
-          req_image1path = req.files.req_image1path;
+      if (req.files !== undefined) {
+        if (req.files["image1path"] !== undefined) {
+          req_image1path = req.files.image1path;
           fs.unlink(image1path, (err) => {
             if (err) console.log(err);
             else {
@@ -192,15 +192,15 @@ exports.edit = async (req, res) => {
             }
           });
           filename = req_image1path.name;
-          newPath1 = "public/upload/opentickets/" + filename;
+          newPath1 = `public/upload/opentickets/${makeUniqueId(10)}${filename}`;
           uploadPath = __dirname + "/../" + newPath1;
           req_image1path.mv(uploadPath, async (err) => {
             if (err) return res.status(500).send(err);
           });
         }
 
-        if (!req.files["image2path"] == undefined) {
-          req_image2path = req.files.req_image2path;
+        if (req.files["image2path"] !== undefined) {
+          req_image2path = req.files.image2path;
           fs.unlink(image2path, (err) => {
             if (err) console.log(err);
             else {
@@ -208,15 +208,15 @@ exports.edit = async (req, res) => {
             }
           });
           filename = req_image2path.name;
-          newPath2 = "public/upload/opentickets/" + filename;
+          newPath2 = `public/upload/opentickets/${makeUniqueId(10)}${filename}`;
           uploadPath = __dirname + "/../" + newPath2;
           req_image2path.mv(uploadPath, async (err) => {
             if (err) return res.status(500).send(err);
           });
         }
 
-        if (!req.files["image3path"] == undefined) {
-          req_image3path = req.files.req_image3path;
+        if (req.files["image3path"] !== undefined) {
+          req_image3path = req.files.image3path;
           fs.unlink(image3path, (err) => {
             if (err) console.log(err);
             else {
@@ -224,7 +224,7 @@ exports.edit = async (req, res) => {
             }
           });
           filename = req_image3path.name;
-          newPath3 = "public/upload/opentickets/" + filename;
+          newPath3 = `public/upload/opentickets/${makeUniqueId(10)}${filename}`;
           uploadPath = __dirname + "/../" + newPath3;
           req_image3path.mv(uploadPath, async (err) => {
             if (err) return res.status(500).send(err);
@@ -238,7 +238,6 @@ exports.edit = async (req, res) => {
         jenis_perbaikan,
         tanggal_pengajuan,
         alasan,
-        inventoris,
         image1path: newPath1,
         image2path: newPath2,
         image3path: newPath3,
