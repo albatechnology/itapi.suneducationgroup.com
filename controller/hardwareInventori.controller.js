@@ -145,13 +145,30 @@ exports.getBySpec = async (req, res) => {
 exports.getByHardwareSpecId = async (req, res) => {
   const hardwareSpecId = req.params.id;
   try {
-    const result = await sequelize.query(
-      "select hardware_inventoris.*, hardware_spesifikasis.nama_hardware, ( select login_data.fullname from login_data where login_data.user_id = hardware_inventoris.user_id ) as assign_to, ( select hardware_assigns.status from hardware_assigns where hardware_assigns.hardware_inventori_id = hardware_inventoris.id and ( hardware_assigns.status = 4 or hardware_assigns.status = 5 or hardware_assigns.status = 6 ) limit 0, 1 ) as assign_status from hardware_inventoris join hardware_spesifikasis on hardware_spesifikasis.id = hardware_inventoris.hardware_spesifikasi_id where hardware_inventoris.hardware_spesifikasi_id = ?  ",
+    const datas = await sequelize.query(
+      "select hardware_inventoris.*,hardware_spesifikasis.nama_hardware,(select hardware_assigns.status from hardware_assigns where hardware_assigns.hardware_inventori_id =  hardware_inventoris.id and (hardware_assigns.status = 4 or hardware_assigns.status = 5 or hardware_assigns.status = 6) limit 0,1 )  as assign_status from hardware_inventoris join hardware_spesifikasis on hardware_spesifikasis.id = hardware_inventoris.hardware_spesifikasi_id where hardware_inventoris.hardware_spesifikasi_id = ?  ",
       {
         replacements: [hardwareSpecId],
         type: QueryTypes.SELECT,
       }
     );
+
+    const users = await LoginData.findAll();
+
+    let result = [];
+    datas.forEach((data) => {
+      let assignedUsers = [];
+
+      if (data.user_ids) {
+        JSON.parse(data.user_ids).forEach((user_id) => {
+          assignedUsers.push(users.find((x) => x.user_id == user_id).fullname);
+        });
+      }
+
+      data.assigned_users = assignedUsers.join(", ");
+      result.push(data);
+    });
+
     res.send(result);
   } catch (e) {
     res.status(400).send(e);
@@ -282,26 +299,30 @@ exports.getUserList = async (req, res) => {
 exports.assign_to = async (req, res) => {
   try {
     if ((userIds = req.body.user_ids)) {
+      const hardwareInventory = await HardwareInventori.findByPk(req.params.id);
+
+      const new_userIds = [];
+
+      // push old data to new variable
+      if (hardwareInventory.user_ids) {
+        JSON.parse(hardwareInventory.user_ids).forEach((user_id) => {
+          new_userIds.push(user_id);
+        });
+      }
+
+      // push new data to new variable
+      userIds.forEach((user_id) => {
+        new_userIds.push(user_id);
+      });
+
       const updateHardwareInventory = await HardwareInventori.update(
         {
-          user_ids: userIds,
+          user_ids: new_userIds,
         },
         {
           where: { id: req.params.id },
         }
       );
-      // create assign into hardware_assign table
-      const hardwareAssignData = {
-        user_ids: userIds,
-        hardware_inventori_id: req.params.id,
-        status: 2,
-      };
-
-      const hardwareAssignCreateResult = await HardwareAssign.create(
-        hardwareAssignData
-      );
-
-      hardwareAssignCreateResult.save();
 
       if (updateHardwareInventory[0] === 1) {
         return res.status(200).send({
@@ -309,14 +330,14 @@ exports.assign_to = async (req, res) => {
         });
       } else {
         return res.status(400).send({
-          status: "Invalid hardware_inventori_id",
+          status: "failed",
         });
       }
     }
 
     return res.status(400).send({
       status: "error",
-      message: "User ID is empty!",
+      message: "User IDs is empty!",
     });
   } catch (e) {
     res.status(400).send(e);

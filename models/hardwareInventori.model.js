@@ -46,6 +46,10 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: true,
     },
+    user_ids: {
+      type: Sequelize.JSON,
+      allowNull: true,
+    },
   });
 
   return HardwareInventori;

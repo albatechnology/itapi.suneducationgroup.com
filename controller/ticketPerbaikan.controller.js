@@ -28,8 +28,7 @@ const {
 */
 
 makeUniqueId = (length) => {
-  var datetime = new Date();
-  var result = "" + datetime.toISOString().slice(0, 10);
+  var result = "";
   var characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   var charactersLength = characters.length;
@@ -49,6 +48,10 @@ exports.create = async (req, res) => {
   for (let keyObj in req.body) {
     if (Array.isArray(req.body[keyObj])) {
       newestArr = req.body[keyObj];
+    } else {
+      if (keyObj === "inventoris[]") {
+        newestArr.push(req.body[keyObj]);
+      }
     }
   }
   let inventoris = newestArr.map((ar) => {
@@ -176,6 +179,10 @@ exports.edit = async (req, res) => {
       for (let keyObj in req.body) {
         if (Array.isArray(req.body[keyObj])) {
           newestArr = req.body[keyObj];
+        } else {
+          if (keyObj === "inventoris[]") {
+            newestArr.push(req.body[keyObj]);
+          }
         }
       }
       let inventoris = newestArr.map((ar) => {
