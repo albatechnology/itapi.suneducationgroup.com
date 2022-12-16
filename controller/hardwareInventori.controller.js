@@ -281,10 +281,10 @@ exports.getUserList = async (req, res) => {
 
 exports.assign_to = async (req, res) => {
   try {
-    if (req.body.user_id) {
+    if ((userIds = req.body.user_ids)) {
       const updateHardwareInventory = await HardwareInventori.update(
         {
-          user_id: req.body.user_id,
+          user_ids: userIds,
         },
         {
           where: { id: req.params.id },
@@ -292,7 +292,7 @@ exports.assign_to = async (req, res) => {
       );
       // create assign into hardware_assign table
       const hardwareAssignData = {
-        user_id: req.body.user_id,
+        user_ids: userIds,
         hardware_inventori_id: req.params.id,
         status: 2,
       };
