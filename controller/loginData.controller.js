@@ -10,7 +10,7 @@ exports.getAll = async (req, res) => {
     let query_filter = " WHERE user_id IS NOT NULL";
     let query_order = " ORDER BY createdAt DESC";
 
-    let hardwareInventori;
+    let hardwareInventori = [];
 
     if ((cabang_id = req.query.cabang_id)) {
       query_filter += ' AND cabang_id="' + cabang_id + '"';
