@@ -7,7 +7,7 @@ const { QueryTypes, json } = require("sequelize");
 exports.getAll = async (req, res) => {
   try {
     const result = await sequelize.query(
-      "select hardware_spesifikasis.*,(select count(hardware_inventoris.hardware_spesifikasi_id) from hardware_inventoris where hardware_inventoris.hardware_spesifikasi_id = hardware_spesifikasis.id) as software_count from hardware_spesifikasis",
+      "select hardware_spesifikasis.*,(select count(hardware_inventoris.hardware_spesifikasi_id) from hardware_inventoris where hardware_inventoris.hardware_spesifikasi_id = hardware_spesifikasis.id) as software_count from hardware_spesifikasis ORDER BY nama_hardware ASC",
       {
         type: QueryTypes.SELECT,
       }
