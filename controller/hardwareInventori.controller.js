@@ -304,23 +304,29 @@ exports.assign_to = async (req, res) => {
       const new_userIds = [];
 
       // push old data to new variable
-      if (hardwareInventory.user_ids) {
-        JSON.parse(hardwareInventory.user_ids).forEach((user_id) => {
-          new_userIds.push(user_id);
-        });
-      }
+      // if (hardwareInventory.user_ids) {
+      //   JSON.parse(hardwareInventory.user_ids).forEach((user_id) => {
+      //     new_userIds.push(user_id);
+      //   });
+      // }
       const inventori = req.body;
       const inventori_id = inventori.hardware_inventori_id;
       const hardware_spesifikasi_id = inventori.hardware_spesifikasi_id;
 
       // push new data to new variable
+      const removeOldAssignedData = await HardwareAssign.destroy({
+        where: { hardware_inventori_id: inventori_id },
+      });
+
       userIds.forEach(async (user_id) => {
         new_userIds.push(user_id);
+
         const hardwareAssignData = {
           user_id: user_id,
           hardware_inventori_id: inventori_id,
           status: 1,
         };
+
         const assignResult = await HardwareAssign.create(hardwareAssignData);
         assignResult.save();
       });
