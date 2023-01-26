@@ -58,7 +58,7 @@ exports.create = async (req, res) => {
     return JSON.parse(ar);
   });
 
-  if (req.files !== undefined) {
+  if (req.files !== null) {
     if (req.files["image1path"] !== undefined) {
       filename = req.files["image1path"].name;
       image1path = `public/upload/opentickets/${makeUniqueId(10)}${filename}`;

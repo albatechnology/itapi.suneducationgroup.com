@@ -37,6 +37,10 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       defaultValue: false,
     },
+    user_ids: {
+      type: Sequelize.JSON,
+      allowNull: true,
+    },
     have_expired: {
       type: Sequelize.STRING,
     },

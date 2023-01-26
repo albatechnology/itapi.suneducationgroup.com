@@ -51,6 +51,8 @@ db.HardwareStockCard = require("./hardwareStockCard.model")(
 );
 db.Software = require("./software.model")(sequelize, Sequelize);
 db.SoftwareLisence = require("./softwareLisence.model")(sequelize, Sequelize);
+db.SoftwareAssign = require("./softwareAssign.model")(sequelize, Sequelize);
+
 db.UoM = require("./uom.model")(sequelize, Sequelize);
 db.FormPermintaan = require("./formPermintaan.model")(sequelize, Sequelize);
 db.FormPermintaanDetails = require("./formPermintaanDetails.model")(
