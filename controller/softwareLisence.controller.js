@@ -1,5 +1,6 @@
 const db = require("../models");
 const SoftwareLisence = db.SoftwareLisence;
+const SoftwareAssign = db.SoftwareAssign;
 const Software = db.Software;
 const sequelize = db.sequelize;
 const { QueryTypes, json } = require("sequelize");
@@ -35,6 +36,62 @@ exports.getById = async (req, res) => {
     //   )
     // }
     res.send(payload);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+};
+
+exports.assign_to = async (req, res) => {
+  try {
+    if ((userIds = req.body.user_ids)) {
+      const softwareInventory = await SoftwareLisence.findByPk(req.params.id);
+      const new_userIds = [];
+      const inventori = req.body;
+      const software_id = inventori.software_inventori_id;
+      // const hardware_spesifikasi_id = inventori.hardware_spesifikasi_id;
+
+      // push new data to new variable
+      if (software_id) {
+        const removeOldAssignedData = await SoftwareAssign.destroy({
+          where: { software_inventori_id: software_id },
+        });
+      }
+      userIds.forEach(async (user_id) => {
+        new_userIds.push(user_id);
+        const softwareAssignData = {
+          user_id: user_id,
+          software_inventori_id: software_id,
+          status: 1,
+        };
+
+        const assignResult = await SoftwareAssign.create(softwareAssignData);
+        assignResult.save();
+      });
+
+      const updateSoftwareInventory = await SoftwareLisence.update(
+        {
+          user_ids: new_userIds,
+        },
+        {
+          where: { id: req.params.id },
+        }
+      );
+
+      if (updateSoftwareInventory[0] === 1) {
+        return res.status(200).send({
+          status: "success",
+        });
+      } else {
+        return res.status(400).send({
+          status: "failed",
+        });
+      }
+    }
+
+    return res.status(400).send({
+      status: "error",
+      message: "User IDs is empty!",
+    });
   } catch (e) {
     res.status(400).send(e);
   }
