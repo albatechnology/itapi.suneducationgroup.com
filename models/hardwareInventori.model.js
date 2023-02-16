@@ -20,6 +20,9 @@ module.exports = (sequelize, Sequelize) => {
     tipe: {
       type: Sequelize.STRING,
     },
+    status_hardware: {
+      type: Sequelize.STRING,
+    },
     serial_number: {
       type: Sequelize.STRING,
     },
