@@ -19,5 +19,9 @@ module.exports = (app) => {
     user.myPeminjamanInventori(req, res);
   });
 
+  router.get("/:id/userinventory", (req, res) => {
+    user.userInventory(req, res);
+  });
+
   app.use("/api/user", router);
 };
