@@ -44,7 +44,7 @@ exports.getAll = (req, res) => {
 exports.getAllAdmin = (req, res) => {
   sequelize
     .query(
-      "select t.*,l.fullname from tickets t join login_data l on l.user_id = t.create_user_id  order by tanggal_pengajuan asc",
+      "select tp.status as status_perbaikan_inventory, t.*, l.fullname from tickets t join login_data l on l.user_id = t.create_user_id join ticket_perbaikan_inventoris tp on t.id = tp.ticket_id order by tanggal_pengajuan asc",
       {
         type: QueryTypes.SELECT,
       }
