@@ -5,6 +5,7 @@ const Software = db.Software;
 const sequelize = db.sequelize;
 const { QueryTypes, json } = require("sequelize");
 const { hardwareSpec } = require(".");
+const LoginData = db.LoginData;
 
 exports.getAll = (req, res) => {
   SoftwareLisence.findAll({ order: [["lisence_id", "asc"]] }).then((data) => {
@@ -100,13 +101,26 @@ exports.assign_to = async (req, res) => {
 exports.getBySoftware = async (req, res) => {
   const softwareId = req.params.id;
   try {
-    const result = await sequelize.query(
+    const datas = await sequelize.query(
       "select software.nama_software,software_lisences.* from software_lisences join software on software.id = software_lisences.software_id where software_lisences.software_id = ?  ",
       {
         replacements: [softwareId],
         type: QueryTypes.SELECT,
       }
     );
+    const users = await LoginData.findAll();
+    let result = [];
+    datas.forEach((data) => {
+      let assignedUsers = [];
+      if (data.user_ids) {
+        JSON.parse(data.user_ids).forEach((user_id) => {
+          assignedUsers.push(users.find((x) => x.user_id == user_id).fullname);
+        });
+      }
+      data.assigned_users = assignedUsers.join(", ");
+      result.push(data);
+    });
+
     res.send(result);
   } catch (e) {
     res.status(400).send(e);
