@@ -49,7 +49,7 @@ exports.assign_to = async (req, res) => {
       const new_userIds = [];
       const inventori = req.body;
       const software_id = inventori.software_inventori_id;
-      // const hardware_spesifikasi_id = inventori.hardware_spesifikasi_id;
+      const software_spesifikasi_id = inventori.software_spesifikasi_id;
 
       // push new data to new variable
       if (software_id) {
