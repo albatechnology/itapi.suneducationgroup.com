@@ -60,9 +60,14 @@ exports.getById = async (req, res) => {
 };
 
 exports.getAvailable = async (req, res) => {
+  console.log("cek di sini bang");
+  hardware_spesifikasi_id = req.params.id;
   try {
     const result = await sequelize.query(
-      "select * from hardware_inventoris where id not in (select hardware_inventori_id from hardware_assigns where status <> 0)",
+      // "select * from hardware_inventoris where id not in (select hardware_inventori_id from hardware_assigns where status <> 0)",
+      "SELECT * FROM hardware_inventoris WHERE hardware_spesifikasi_id='" +
+        hardware_spesifikasi_id +
+        "'AND status_hardware='AVAILABLE'",
       {
         type: QueryTypes.SELECT,
       }

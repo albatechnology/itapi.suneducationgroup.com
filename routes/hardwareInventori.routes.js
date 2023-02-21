@@ -11,7 +11,7 @@ module.exports = (app) => {
     hardwareInventori.getAll(req, res);
   });
 
-  router.get("/available", (req, res) => {
+  router.get("/:id/available", (req, res) => {
     //console.log(req.body);
     hardwareInventori.getAvailable(req, res);
   });
