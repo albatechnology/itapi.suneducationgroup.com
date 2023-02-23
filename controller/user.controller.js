@@ -80,7 +80,7 @@ exports.myInventori = async (req, res) => {
   const user_id = req.params.id;
 
   hardwareInventoriResult = await sequelize.query(
-    "select hardware_inventoris.*,hardware_spesifikasis.nama_hardware from hardware_inventoris join hardware_spesifikasis on hardware_spesifikasis.id = hardware_inventoris.hardware_spesifikasi_id where hardware_inventoris.id in (select hardware_inventori_id from hardware_assigns where user_id = ?)",
+    "select hardware_inventoris.*,hardware_spesifikasis.nama_hardware from hardware_inventoris join hardware_spesifikasis on hardware_spesifikasis.id = hardware_inventoris.hardware_spesifikasi_id where hardware_inventoris.id in (select hardware_inventori_id from hardware_assigns where user_id = ?) AND hardware_inventoris.user_ids <> '[]'",
     {
       replacements: [user_id],
       type: QueryTypes.SELECT,
@@ -116,7 +116,7 @@ exports.myPeminjamanInventori = async (req, res) => {
 exports.userInventory = async (req, res) => {
   const user_id = req.params.id;
   userInventoryResult = await sequelize.query(
-    "select hardware_inventoris.*,hardware_spesifikasis.nama_hardware from hardware_inventoris join hardware_spesifikasis on hardware_spesifikasis.id = hardware_inventoris.hardware_spesifikasi_id where hardware_inventoris.id in (select hardware_inventori_id from hardware_assigns where user_id = ?)",
+    "select hardware_inventoris.*,hardware_spesifikasis.nama_hardware from hardware_inventoris join hardware_spesifikasis on hardware_spesifikasis.id = hardware_inventoris.hardware_spesifikasi_id where hardware_inventoris.id in (select hardware_inventori_id from hardware_assigns where user_id = ?) AND hardware_inventoris.user_ids <> '[]'",
     {
       replacements: [user_id],
       type: QueryTypes.SELECT,

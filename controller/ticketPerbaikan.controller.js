@@ -343,6 +343,7 @@ exports.processRepairInventori = async (req, res) => {
     if (ticketData.jenis_ticket === "PERBAIKAN") {
       const ticketPerbaikanInventoriResult =
         await TicketPerbaikanInventori.findByPk(perbaikanInventoriId);
+
       if (ticketPerbaikanInventoriResult.status == 3) {
         // update detail status
         const updateResult = await TicketPerbaikanInventori.update(
@@ -383,12 +384,10 @@ exports.assignReplaceInventori = async (req, res) => {
     perbaikanInventoriId
   );
   if (perbaikanInventoriResult) {
-    console.log("perbaikanInventoriResult", perbaikanInventoriResult);
     inventori = perbaikanInventoriResult.dataValues;
     ticketId = inventori.ticket_id;
     const ticketResult = await Ticket.findByPk(ticketId);
     if (ticketResult) {
-      console.log("ticketResult", ticketResult);
       ticketData = ticketResult.dataValues;
       // update assign lama jadi 0
       const oldInventoriId = inventori.inventori_id;
@@ -397,7 +396,6 @@ exports.assignReplaceInventori = async (req, res) => {
         where: { hardware_inventori_id: oldInventoriId, status: 2 },
       });
       if (hardwareAssignResult[0] !== undefined) {
-        console.log("hardware assing found");
         const hardwareAssignUpdateResult = await HardwareAssign.update(
           { status: 0 },
           {

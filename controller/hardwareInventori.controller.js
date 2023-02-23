@@ -60,7 +60,7 @@ exports.getById = async (req, res) => {
 };
 
 exports.getAvailable = async (req, res) => {
-  console.log("cek di sini bang");
+  // hardware_spesifikasi_id = req.params.id;
   hardware_spesifikasi_id = req.params.id;
   try {
     const result = await sequelize.query(

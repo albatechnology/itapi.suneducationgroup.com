@@ -14,9 +14,13 @@ module.exports = (app) => {
     softwareLisence.getById(req, res);
   });
 
-  router.get("/:id/assign_to", (req, res) => {
+  router.put("/:id/assign_to", (req, res) => {
     softwareLisence.assign_to(req, res);
   });
+
+  // router.get("/channels/list", (req, res) => {
+  //   hardwareInventori.getAllChannel(req, res);
+  // });
 
   router.get("/software/:id", (req, res) => {
     softwareLisence.getBySoftware(req, res);

@@ -7,29 +7,29 @@ module.exports = (app) => {
   });
 
   router.get("/", (req, res) => {
-    //console.log(req.body);
     hardwareInventori.getAll(req, res);
   });
 
   router.get("/:id/available", (req, res) => {
-    //console.log(req.body);
     hardwareInventori.getAvailable(req, res);
   });
+
+  // router.get("/available", (req, res) => {
+  //
+  //   hardwareInventori.getAvailable(req, res);
+  // });
+
   router.get("/:id/assigned", (req, res) => {
-    //console.log(req.body);
     hardwareInventori.getAssigned(req, res);
   });
   router.get("/brokenatit", (req, res) => {
-    //console.log(req.body);
     hardwareInventori.getBrokenAtIT(req, res);
   });
   router.get("/brokenatvendor", (req, res) => {
-    //console.log(req.body);
     hardwareInventori.getBrokenAtVendor(req, res);
   });
 
   router.get("/:id", (req, res) => {
-    //console.log();
     hardwareInventori.getById(req, res);
   });
   router.get("/hardwarespecid/:id", (req, res) => {
