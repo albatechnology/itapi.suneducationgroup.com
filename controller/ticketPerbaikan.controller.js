@@ -42,7 +42,6 @@ exports.create = async (req, res) => {
   let image1path = "";
   let image2path = "";
   let image3path = "";
-  // console.log("cek req body", req.body.image1path);
 
   let newestArr = [];
   for (let keyObj in req.body) {
@@ -374,66 +373,145 @@ exports.processRepairInventori = async (req, res) => {
   res.send(payload);
 };
 exports.assignReplaceInventori = async (req, res) => {
-  const { hardwareInventoriId, perbaikanInventoriId } = req.body;
+  const { hardwareInventoriId, perbaikan_inventory_id, new_hardware_id } =
+    req.body;
   const user_id = req.user.user_id;
   let ticketId = 0;
   let inventori = {};
   let payload = {};
 
   const perbaikanInventoriResult = await TicketPerbaikanInventori.findByPk(
-    perbaikanInventoriId
+    perbaikan_inventory_id
   );
+  // dataValues: {
+  //   id: 46,
+  //   ticket_id: 49,
+  //   inventori_id: 851,
+  //   keterangan: 'hehe',
+  //   status: 3,
+  //   admin_approve_time: 2023-02-23T09:03:50.000Z,
+  //   completed_time: null,
+  //   decline_time: null,
+  //   is_delete: false,
+  //   createdAt: 2023-02-23T09:03:44.000Z,
+  //   updatedAt: 2023-02-23T09:03:50.000Z
+  // }
   if (perbaikanInventoriResult) {
     inventori = perbaikanInventoriResult.dataValues;
     ticketId = inventori.ticket_id;
     const ticketResult = await Ticket.findByPk(ticketId);
     if (ticketResult) {
       ticketData = ticketResult.dataValues;
+      create_user_id = ticketData.create_user_id;
+
       // update assign lama jadi 0
       const oldInventoriId = inventori.inventori_id;
+      const hardwareInventorisResult = await HardwareInventori.findByPk(
+        oldInventoriId
+      );
 
-      const hardwareAssignResult = await HardwareAssign.findAll({
-        where: { hardware_inventori_id: oldInventoriId, status: 2 },
-      });
-      if (hardwareAssignResult[0] !== undefined) {
-        const hardwareAssignUpdateResult = await HardwareAssign.update(
-          { status: 0 },
+      if (hardwareInventorisResult) {
+        userIds = hardwareInventorisResult.dataValues.user_ids;
+        let splitUserIdsResult = eval(userIds); // [ 757, 740, 739 ]
+        splitUserIdsResult = splitUserIdsResult.filter(
+          (element) => element !== create_user_id
+        );
+
+        const unAssignHardwareInventory = await HardwareInventori.update(
           {
-            where: {
-              hardware_inventori_id: hardwareAssignResult[0],
-              status: 2,
-            },
+            user_ids: splitUserIdsResult,
+          },
+          {
+            where: { id: oldInventoriId },
           }
         );
       }
-      // insert assign baru
-
-      const hardwareAssignData = {
-        user_id: ticketData.create_user_id,
-        hardware_inventori_id: hardwareInventoriId,
-        status: 2,
-      };
-      const hardwareAssignCreateResult = await HardwareAssign.create(
-        hardwareAssignData
+      const newhardwareInventorisResult = await HardwareInventori.findByPk(
+        new_hardware_id
       );
 
-      // update detail status
-      const updateResult = await TicketPerbaikanInventori.update(
-        { status: 10, completed_time: sequelize.fn("NOW") },
-        { where: { id: perbaikanInventoriId } }
-      );
+      if (newhardwareInventorisResult) {
+        newHardwareId = newhardwareInventorisResult.dataValues.id;
+        userIds = JSON.parse(newhardwareInventorisResult.dataValues.user_ids);
+        userIds.push(create_user_id);
 
-      payload = await getTicketData(ticketData);
+        const hardwareAssignData = {
+          user_id: create_user_id,
+          hardware_inventori_id: newHardwareId,
+          status: 1,
+        };
+
+        const assignResult = await HardwareAssign.create(hardwareAssignData);
+        assignResult.save();
+
+        const newAssignHardwareInventory = await HardwareInventori.update(
+          {
+            user_ids: userIds,
+          },
+          {
+            where: { id: newHardwareId },
+          }
+        );
+
+        const inventoriData = {
+          ticket_id: ticketId,
+          inventori_id: new_hardware_id,
+          keterangan: inventori.keterangan,
+          status: inventori.status,
+          is_delete: 0,
+        };
+        inventoriResult = TicketPerbaikanInventori.create(inventoriData);
+
+        if (newAssignHardwareInventory) {
+          return res.status(200).send({
+            status: "success",
+          });
+        } else {
+          return res.status(400).send({
+            status: "failed",
+          });
+        }
+      }
+      // const hardwareAssignResult = await HardwareAssign.findAll({
+      //   where: { hardware_inventori_id: oldInventoriId, status: 2 },
+      // });
+
+      // if (hardwareAssignResult[0] !== undefined) {
+      //   const hardwareAssignUpdateResult = await HardwareAssign.update(
+      //     { status: 0 },
+      //     {
+      //       where: {
+      //         hardware_inventori_id: hardwareAssignResult[0],
+      //         status: 2,
+      //       },
+      //     }
+      //   );
+      // }
+      // // insert assign baru
+
+      // const hardwareAssignData = {
+      //   user_id: ticketData.create_user_id,
+      //   hardware_inventori_id: hardwareInventoriId,
+      //   status: 2,
+      // };
+      // const hardwareAssignCreateResult = await HardwareAssign.create(
+      //   hardwareAssignData
+      // );
+
+      // // update detail status
+      // const updateResult = await TicketPerbaikanInventori.update(
+      //   { status: 10, completed_time: sequelize.fn("NOW") },
+      //   { where: { id: perbaikanInventoriId } }
+      // );
     }
+    // payload = await getTicketData(ticketData);
   }
-
-  res.send(payload);
+  // res.send(payload);
 };
 
 exports.assignPeminjamanInventori = async (req, res) => {
   const { hardwareInventoriId, perbaikanInventoriId } = req.body;
   const user_id = req.user.user_id;
-  //console.log("req body", req.body);
   let ticketId = 0;
   let inventori = {};
   let payload = {};
@@ -442,12 +520,10 @@ exports.assignPeminjamanInventori = async (req, res) => {
     perbaikanInventoriId
   );
   if (perbaikanInventoriResult) {
-    //console.log("perbaikanInventoriResult", perbaikanInventoriResult);
     inventori = perbaikanInventoriResult.dataValues;
     ticketId = inventori.ticket_id;
     const ticketResult = await Ticket.findByPk(ticketId);
     if (ticketResult) {
-      //console.log("ticketResult", ticketResult);
       ticketData = ticketResult.dataValues;
       // insert assign baru
 
@@ -489,12 +565,14 @@ exports.shippingPeminjaman = async (req, res) => {
   let payload = {};
 
   const ticketResult = await Ticket.findByPk(ticketId);
+
   if (ticketResult) {
     ticketData = ticketResult.dataValues;
 
     if (ticketData.jenis_ticket === "PERBAIKAN") {
       const ticketPerbaikanInventoriResult =
         await TicketPerbaikanInventori.findByPk(perbaikanInventoriId);
+
       if (ticketPerbaikanInventoriResult) {
         // get peminjaman
         const peminjamanResult = await TicketPerbaikanPeminjaman.findAll({
@@ -520,7 +598,6 @@ exports.shippingPeminjaman = async (req, res) => {
               hardware_spesifikasi_id
             );
             if (hardwareSpecResult) {
-              console.log("hardwareSpecResult", hardwareSpecResult);
               const stock_qty = hardwareSpecResult.dataValues.stock_qty;
               const hardwareSpecUpdate = await HardwareSpec.update(
                 { stock_qty: stock_qty - 1 },
@@ -534,6 +611,17 @@ exports.shippingPeminjaman = async (req, res) => {
             { status: 4, shipping_time: sequelize.fn("NOW") },
             { where: { id: peminjamanResult[0].id } }
           );
+
+          // new update status inventoris
+          const peminjamanInventorisUpdate =
+            await TicketPerbaikanInventori.update(
+              { status: 4, shipping_time: sequelize.fn("NOW") },
+              {
+                where: {
+                  id: peminjamanResult[0].ticket_perbaikan_inventori_id,
+                },
+              }
+            );
         }
       }
 
@@ -580,6 +668,17 @@ exports.receivePeminjaman = async (req, res) => {
             { status: 5, user_receive_time: sequelize.fn("NOW") },
             { where: { id: peminjamanResult[0].id } }
           );
+
+          // new update status inventoris
+          const peminjamanInventorisUpdate =
+            await TicketPerbaikanInventori.update(
+              { status: 5 },
+              {
+                where: {
+                  id: peminjamanResult[0].ticket_perbaikan_inventori_id,
+                },
+              }
+            );
         }
       }
 

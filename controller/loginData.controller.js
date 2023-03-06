@@ -26,7 +26,7 @@ exports.getAll = async (req, res) => {
 
       inventoryTable = "software_lisences";
       inventoryAssignTable = "software_assigns";
-      inventoryColumn = "software_inventori_id";
+      inventoryColumn = "software_inventory_id";
     }
 
     // get inventory data

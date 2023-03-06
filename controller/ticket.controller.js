@@ -44,7 +44,7 @@ exports.getAll = (req, res) => {
 exports.getAllAdmin = (req, res) => {
   sequelize
     .query(
-      "select tp.status as status_perbaikan_inventory, t.*, l.fullname from tickets t join login_data l on l.user_id = t.create_user_id left join ticket_perbaikan_inventoris tp on t.id = tp.ticket_id order by tanggal_pengajuan asc",
+      "select tp.status as status_perbaikan_inventory, t.*, l.fullname from tickets t join login_data l on l.user_id = t.create_user_id left join ticket_perbaikan_inventoris tp on t.id = tp.ticket_id ORDER BY tanggal_pengajuan asc",
       {
         type: QueryTypes.SELECT,
       }
@@ -745,7 +745,7 @@ const getTicketData = async (ticketId) => {
     if (resTicket[0].jenis_ticket === "PERBAIKAN") {
       resTicketInventoris = await sequelize.query(
         // "select i.*,hi.no_asset,hi.merek,hi.tipe,hi.serial_number,hi.hardware_spesifikasi_id,hs.nama_hardware from ticket_perbaikan_inventoris i join hardware_inventoris hi on hi.id = i.inventori_id join hardware_spesifikasis hs on hs.id = hi.hardware_spesifikasi_id where i.ticket_id = ? order by i.id asc",
-        "select i.*, hi.no_asset, hi.merek, hi.tipe, hi.serial_number, hi.hardware_spesifikasi_id, hs.nama_hardware, tp.jenis_perbaikan from ticket_perbaikan_inventoris i join hardware_inventoris hi on hi.id = i.inventori_id join hardware_spesifikasis hs on hs.id = hi.hardware_spesifikasi_id join ticket_perbaikans tp on tp.ticket_id = i.ticket_id where i.ticket_id = ? order by i.id asc",
+        "select i.*, hi.no_asset, hi.merek, hi.tipe, hi.user_ids, hi.serial_number, hi.hardware_spesifikasi_id, hs.nama_hardware, tp.jenis_perbaikan from ticket_perbaikan_inventoris i join hardware_inventoris hi on hi.id = i.inventori_id join hardware_spesifikasis hs on hs.id = hi.hardware_spesifikasi_id join ticket_perbaikans tp on tp.ticket_id = i.ticket_id where i.ticket_id = ? order by i.id asc",
         {
           replacements: [ticketId],
           type: QueryTypes.SELECT,
